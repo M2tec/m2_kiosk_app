@@ -1,8 +1,9 @@
 #!/bin/python3
 
-import time
 
 import argparse
+import time
+
 
 import gi
 import json
@@ -11,6 +12,9 @@ import threading
 import time
 import qrcode
 import requests
+
+import secrets
+import string
 
 from datetime import datetime
 
@@ -21,6 +25,8 @@ from cardano.backends.walletrest import WalletREST
 
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gio, GLib, Gtk, GdkPixbuf
+
+ws = WalletService(WalletREST(port=8090))
 
 def is_port_in_use(port):
     import socket
@@ -146,10 +152,10 @@ class Runner:
         self.count = 0
 
     def __call__(self, *args):
-        wallet_id = '0edadd08ee147a09595fcd8bca63a9940b80a60e'
         transaction_id = args[0]
         service_id = args[1]
-                
+        wallet_id = args[2]
+                        
         result = transactions(wallet_id, transaction_id)
         
         print("result = "  + result )
@@ -167,7 +173,8 @@ check_blockchain = Runner(100)
 
 def create_transaction_json(transaction_id, wallet_address, amount):
 
-    print('shop code: ' + transaction_id + wallet_address + str(amount))
+
+    print('shop code: ' + transaction_id + str(wallet_address) + str(amount))
     metadata_dict = {
         '123': {'message': transaction_id}
     }
@@ -256,7 +263,7 @@ def handle_method_call(
 
     elif method_name == "SetPayment":
         transaction_id = params.unpack()[0]
-        wallet_address = params.unpack()[1]
+        wallet_id = params.unpack()[1]
         pay_amount = float(params.unpack()[2])
         service_id = params.unpack()[3]
         
@@ -267,10 +274,13 @@ def handle_method_call(
         # variant.
         invocation.return_value(greeting)
 
+        wallet = Wallet(wallet_id, backend=WalletREST(port=8090))
+        wallet_address = str(wallet.first_unused_address())
+        print(wallet_address)
+        
         create_qr_code(transaction_id, wallet_address, pay_amount)
         
         qr_code_file_name = 'static/shop_qr_code-' + transaction_id + '.png'
-        print
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(qr_code_file_name)
         pixbuf = pixbuf.scale_simple(380, 380, GdkPixbuf.InterpType.BILINEAR)
         image1.set_from_pixbuf(pixbuf)   
@@ -278,7 +288,8 @@ def handle_method_call(
         amount_label.set_text("{:.2f}".format(pay_amount))         
         
         check_blockchain.count = 0
-        GLib.timeout_add(5000, check_blockchain, transaction_id, service_id)   
+        print(transaction_id + ' ' + service_id)
+        GLib.timeout_add(5000, check_blockchain, transaction_id, service_id, wallet_id)   
 
     elif method_name == "Quit":
         loop.quit()
@@ -346,34 +357,47 @@ if __name__ == "__main__":
     stdout = process.stdout.readline()
     stderr = process.stderr.readline()
 
-    ws = WalletService(WalletREST(port=8090))
     wallets = ws.wallets()
 
     if not stderr.startswith('Ok'):
         print('Are you sure the Cardano wallet backend is running')
         print(stderr)
     else:
-        if wallets:
-            print('\nThe following wallets are available listed by id:')
-            for wallet in wallets:
-                print(wallet.wid)
-        else:
+        if not wallets:
             print('There are no wallets defined')
-                       
+            print('Creating a new wallet')
+            print('WARNING: Security key is saved in mnemonic.txt store in a safe place')
+            
+            # Gererate a mnemonic   
             command_list = ['cardano-wallet', 'recovery-phrase', 'generate']
             process = subprocess.Popen(command_list, 
                               stdout=subprocess.PIPE,
                               stderr=subprocess.PIPE,
                               universal_newlines=True)            
+            mnemonic = process.stdout.readline()
+                       
+            # Generate a password for a new wallet
+            alphabet = string.ascii_letters + string.digits
+            password = ''.join(secrets.choice(alphabet) for i in range(10))  # for a 20-character password
+
+            print(mnemonic)
+            print(password)
+
+            # Save the mnemonic to a file
+            f = open("mnemonic.txt", "a")
+            f.write(mnemonic)
+            f.write(password)
+            f.close()
             
             wal = ws.create_wallet(
                 name="Odoo shop wallet",
-                mnemonic="resist render west spin antique wild gossip thing syrup network risk gospel seek drop receive",
-                passphrase="xxx",
+                mnemonic=mnemonic,
+                passphrase=password,
                 ) 
-
- 
-    quit()
+                
+        print('\nThe following wallets are available listed by id:')
+        for wallet in wallets:
+            print(wallet.wid)
     
     # Start a system message bus for the paypad
     # And request the name and run the server.
