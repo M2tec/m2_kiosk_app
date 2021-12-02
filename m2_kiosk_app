@@ -1,0 +1,394 @@
+#!/bin/python3
+
+import time
+
+import argparse
+
+import gi
+import json
+import subprocess
+import threading
+import time
+import qrcode
+import requests
+
+from datetime import datetime
+
+from cardano.wallet import Wallet
+from cardano.wallet import WalletService
+
+from cardano.backends.walletrest import WalletREST
+
+gi.require_version("Gtk", "3.0")
+from gi.repository import Gio, GLib, Gtk, GdkPixbuf
+
+def is_port_in_use(port):
+    import socket
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        return s.connect_ex(('localhost', port)) == 0
+
+
+# Handle command line arguments
+parser = argparse.ArgumentParser(description='M2 Kiosk App for processing blockchain payments.')
+parser.add_argument('-p', '--odoo-port', help='specify Odoo port number')
+args = parser.parse_args(['--odoo-port', '8069'])
+odoo_port = args.odoo_port
+
+# Thanks to  Gio test files at GNOME repo: glib/blob/master/gio/tests/gdbus-example-server.c
+# Generating interface from XML is easy. Look at the above file on how it is done.
+# A better resource : http://maemo.org/maemo_training_material/maemo4.x/html/
+#                     maemo_Platform_Development_Chinook/
+#                     Chapter_03_Using_the_GLib_wrappers_for_DBus.html
+#                     #DBusinterfacedefinitionusingXML
+
+
+
+xml = (
+    "<node>"
+    "  <interface name='org.m2tec.paypad'>"
+    "    <method name='PollAlive'>"
+    "      <arg type='s' name='msg' direction='in'/>"
+    "      <arg type='s' name='serviceId' direction='out'/>"
+    "    </method>"
+    "    <method name='SetPayment'>"
+    "      <arg type='s' name='transactionId' direction='in'/>"
+    "      <arg type='s' name='walletAddress' direction='in'/>"
+    "      <arg type='s' name='payAmount' direction='in'/>"
+    "      <arg type='s' name='ServiceId' direction='in'/>"
+    "      <arg type='s' name='greeting' direction='out'/>"
+    "    </method>"
+    "    <method name='Quit'/>"
+    "  </interface>"
+    "</node>"
+)
+
+node = Gio.DBusNodeInfo.new_for_xml(xml)  # We make a node for the xml
+#loop = GLib.MainLoop() # A loop to handle API
+
+builder = Gtk.Builder()
+builder.add_from_file("paypad.glade")
+amount_label = builder.get_object("amount_label")
+window1 = builder.get_object("window1")
+
+headerbar = Gtk.HeaderBar()
+headerbar.set_title("M2 PayPad")
+headerbar.set_show_close_button(False)
+window1.set_titlebar(headerbar)
+
+#window1.set_show_close_button(False)
+image1 = builder.get_object("image1")
+pixbuf = GdkPixbuf.Pixbuf.new_from_file('./static/default.png')
+pixbuf = pixbuf.scale_simple(380, 380, GdkPixbuf.InterpType.BILINEAR)
+image1.set_from_pixbuf(pixbuf)   
+
+def transactions(wallet_id, transaction_id):
+    wal0 = Wallet(wallet_id, backend=WalletREST(port=8090))
+    wal0.sync_progress()
+    
+    wallet_balance = wal0.balance().total
+    #print(wal0.balance().total)
+    
+    tnxs = wal0.transactions()
+    
+    transact = []
+    
+    result = "OK"
+    
+    for tnx in tnxs:
+        tnx_dict = {'id': tnx.txid, 'fee': tnx.fee, 'input': tnx.amount_in, 'output': tnx.amount_out, 'metadata': tnx.metadata, 'status' : tnx.status}
+        
+        #print(dir(tnx))
+        #print(json.dumps(tnx, indent=4, sort_keys=False))
+        #print(repr(tnx_dict))
+        #print("\n")
+        #transact.append(tnx_dict)   
+        
+        metadata = tnx.metadata
+        #print(metadata.keys())
+        
+        tx_id = ''
+        
+        try:
+            tx_id = metadata[73]['title']
+            #print('tx_id: ' + str(tx_id))
+        except KeyError:
+            pass
+    
+        #print("tx_id = " + tx_id + " and transaction_id = " + transaction_id)
+        if tx_id != '' and tx_id == transaction_id:
+            print("success")
+            result = "success"          
+            
+    return result
+
+def confirm_payment(service_id):
+    TIMEOUT = 10
+    endpoint = 'http://localhost:' + odoo_port + '/pos_cardano/notification'
+    
+    headers = {
+        'Content-Type': 'application/json'
+    }
+
+    confirmation_data = {
+        "SaleToPOIResponse": {"PaymentResponse": {"Response": { "Result" : "Success"}, "PaymentResult" : { "AmountsResp" : "-",  "AmountsResp" : "-"} },
+                              "MessageHeader": {"MessageCategory": "Payment",
+                                                "MessageClass": "Service",
+                                                "MessageType": "Response",
+                                                "POIID": "Terminal1",
+                                                "ProtocolVersion": "3.0",
+                                                "SaleID": "x",
+                                                "ServiceID": service_id}}}
+    request_odoo = requests.post(endpoint, data=json.dumps(confirmation_data), headers=headers, timeout=TIMEOUT) 
+
+class Runner:
+    def __init__(self, num_times):
+        self.num_times = num_times
+        self.count = 0
+
+    def __call__(self, *args):
+        wallet_id = '0edadd08ee147a09595fcd8bca63a9940b80a60e'
+        transaction_id = args[0]
+        service_id = args[1]
+                
+        result = transactions(wallet_id, transaction_id)
+        
+        print("result = "  + result )
+        if result == "success":
+            print("go to confirm payment")
+            confirm_payment(service_id)
+            self.count = self.num_times
+            
+        self.count += 1
+        print("Periodic timer [{}]: args={}".format(self.count, args))
+        
+        return self.count < self.num_times
+
+check_blockchain = Runner(100)
+
+def create_transaction_json(transaction_id, wallet_address, amount):
+
+    print('shop code: ' + transaction_id + wallet_address + str(amount))
+    metadata_dict = {
+        '123': {'message': transaction_id}
+    }
+        
+    amounts_dict_1 = {
+        'quantity': str(int(amount * 1000000)), 
+        'policyId': 'ada', 
+        'assetName': 'ada'
+    }
+    
+    amounts_list = [ amounts_dict_1 ]
+    
+    outputs_dict = { 
+        wallet_address : amounts_list
+    }
+
+    transaction_dict = {
+        'type': 'tx', 
+        'title': transaction_id, 
+        'outputs': outputs_dict,
+    }
+
+    print(json.dumps(transaction_dict, indent=4, sort_keys=True))
+    
+    return json.dumps(transaction_dict)
+
+def create_qr_code(transaction_id, wallet_address, amount ):
+
+    tx_json = create_transaction_json(transaction_id, wallet_address, amount)
+   
+    filename_qr_code = 'static/shop_qr_code-' + transaction_id + '.png'
+    print(filename_qr_code)    
+    
+    cardano_net = 'testnet'    
+    gc_cli = '/home/maarten/cardano-src/m2_kiosk_app/node_modules/gamechanger-dapp-cli/cli.js'
+    command_list = [gc_cli, cardano_net, 'build', 'qr', '-a', tx_json, '-o', filename_qr_code]
+    result = subprocess.run(command_list, stdout=subprocess.PIPE)
+
+def handle_method_call(
+    connection, sender, object_path, interface_name, method_name, params, invocation
+):
+    """
+    This is the top-level function that handles all the method calls to our server.
+    The first four parameters are self-explanatory.
+    `method_name` is a string that describes our method name.
+    `params` is a GLib.Variant that are inputs/parameters to the method.
+    `invocation` is a Gio.DBusMethodInvocation, something like a messenger that transports
+    our reply back to sender.
+    """
+
+    print("CALLED")
+    # We need to unpack GLib.Variant to a Python object. The unpacked one is always a
+    # tuple.
+    if method_name == "PollAlive":
+        msg = params.unpack()[0]  # First argument is what we need
+        print(f"FROM {sender} : {msg}")
+        
+        now = datetime.now()
+        dt_string = now.strftime("%Y-%m-%d-%H-%M-%S")
+        #print("date and time =", dt_string)	        
+                
+        service_id = GLib.Variant("(s)", (f"sID-{dt_string}",))
+        invocation.return_value(service_id)  # Nothing to say, so just return None.
+
+        # Send the answer as a http request to Odoo
+        TIMEOUT = 10
+        endpoint = 'http://localhost:' + odoo_port + '/pos_cardano/notification'
+        
+        headers = {
+            'Content-Type': 'application/json'
+        }    
+           
+        diagnosis_data = {        
+                "SaleToPOIResponse": {"DiagnosisResponse": {"HostDiagnosisFlag": False},
+                              "MessageHeader": {"MessageCategory": "Diagnosis",
+                                                "MessageClass": "Service",
+                                                "MessageType": "Response",
+                                                "POIID": "Terminal1",
+                                                "ProtocolVersion": "3.0",
+                                                "SaleID": "Shop (Mitchell Admin) (ID: "
+                                                          "1)",
+                                                "ServiceID": "sID-" + dt_string }}}
+        
+        request_odoo = requests.post(endpoint, data=json.dumps(diagnosis_data), headers=headers, timeout=TIMEOUT)    
+
+
+    elif method_name == "SetPayment":
+        transaction_id = params.unpack()[0]
+        wallet_address = params.unpack()[1]
+        pay_amount = float(params.unpack()[2])
+        service_id = params.unpack()[3]
+        
+        print(f"FROM {sender} : CONFIRMED {pay_amount}")
+        greeting = GLib.Variant(
+            "(s)", (f"Amount set to: {pay_amount}",)
+        )  # All form of return should be a
+        # variant.
+        invocation.return_value(greeting)
+
+        create_qr_code(transaction_id, wallet_address, pay_amount)
+        
+        qr_code_file_name = 'static/shop_qr_code-' + transaction_id + '.png'
+        print
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file(qr_code_file_name)
+        pixbuf = pixbuf.scale_simple(380, 380, GdkPixbuf.InterpType.BILINEAR)
+        image1.set_from_pixbuf(pixbuf)   
+
+        amount_label.set_text("{:.2f}".format(pay_amount))         
+        
+        check_blockchain.count = 0
+        GLib.timeout_add(5000, check_blockchain, transaction_id, service_id)   
+
+    elif method_name == "Quit":
+        loop.quit()
+        invocation.return_value(None)
+
+    # No need of an else part to handle methods which we didn't mention in XML.
+    # When a client does something like that, they get an error.
+    # The same holds for parameters.
+    # Always return something (actually return value specified in XML) via invocation,
+    # otherwise client get a response-timeout error.
+
+
+def on_bus_acquired(connection, name):
+
+    """
+    The function that introduces our server to the world. It is called automatically
+    when we get the bus we asked.
+    """
+
+    # Remember the node we made earlier? That has a list as interfaces attribute.
+    # From that get our interface. We made only one interface, so we get the first
+    # interface.
+
+    print("Bus acquired for name, ", name)
+    reg_id = connection.register_object(
+        "/org/m2tec/paypad", node.interfaces[0], handle_method_call, None, None
+    )
+
+
+def on_name_acquired(connection, name):
+
+    """
+    What to do after name acquired?
+    """
+
+    print("Name acquired :", name)
+
+
+def on_name_lost(connection, name):
+
+    """
+    What to do after our name is lost? May be just exit.
+    """
+
+    print("Name lost :", name)
+    exit(0)
+
+
+if __name__ == "__main__":
+
+    # Check if Odoo is running
+    if is_port_in_use(int(odoo_port)):
+        print("Connecting to Odoo on port: " + odoo_port)
+    else:
+        print("Make sure Odoo is running on port: " + str(odoo_port))
+        quit()
+        
+    # Check if cardano wallet backend is running
+    command_list = ['cardano-wallet', 'wallet', 'list']
+    process = subprocess.Popen(command_list, 
+                              stdout=subprocess.PIPE,
+                              stderr=subprocess.PIPE,
+                              universal_newlines=True)
+     
+    stdout = process.stdout.readline()
+    stderr = process.stderr.readline()
+
+    ws = WalletService(WalletREST(port=8090))
+    wallets = ws.wallets()
+
+    if not stderr.startswith('Ok'):
+        print('Are you sure the Cardano wallet backend is running')
+        print(stderr)
+    else:
+        if wallets:
+            print('\nThe following wallets are available listed by id:')
+            for wallet in wallets:
+                print(wallet.wid)
+        else:
+            print('There are no wallets defined')
+                       
+            command_list = ['cardano-wallet', 'recovery-phrase', 'generate']
+            process = subprocess.Popen(command_list, 
+                              stdout=subprocess.PIPE,
+                              stderr=subprocess.PIPE,
+                              universal_newlines=True)            
+            
+            wal = ws.create_wallet(
+                name="Odoo shop wallet",
+                mnemonic="resist render west spin antique wild gossip thing syrup network risk gospel seek drop receive",
+                passphrase="xxx",
+                ) 
+
+ 
+    quit()
+    
+    # Start a system message bus for the paypad
+    # And request the name and run the server.
+    owner_id = Gio.bus_own_name(
+        Gio.BusType.SYSTEM,  
+        "org.m2tec.paypad",  
+        Gio.BusNameOwnerFlags.NONE,  
+        on_bus_acquired,
+        on_name_acquired,
+        on_name_lost,
+    )
+    
+    window1.show_all()
+
+    Gtk.main() #loop.run()  # Like a web server, ours has to be active for client access
+    Gio.bus_unown_name(owner_id)
+    print("Exiting...")
+
