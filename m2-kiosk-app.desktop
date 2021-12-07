@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Encoding=UTF-8
+Name=M2 Kiosk App 
+Comment=Blockchain payment provider app for Odoo
+Icon=/path/to/icon.xpm
+Exec=/path/to/application/executable
+Terminal=false
+Categories=Tags;Describing;Application
