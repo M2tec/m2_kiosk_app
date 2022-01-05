@@ -4,13 +4,11 @@ import string
 import subprocess
 
 
-
-
-
 def is_port_in_use(port):
     import socket
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         return s.connect_ex(('localhost', port)) == 0
+
 
 def check_odoo_and_cardano(odoo_port, wallet_port):
 
@@ -27,6 +25,7 @@ def check_odoo_and_cardano(odoo_port, wallet_port):
     else:
         print("Make sure the Cardano wallet backend is running on port: " + str(wallet_port))
         quit()
+
 
 def check_cardano_wallets(ws):
     # Check if cardano wallet backend is running

@@ -3,26 +3,25 @@
 import argparse
 import gi
 import json
-
-import requests
-from datetime import datetime
+from pprint import pprint
 
 from cardano.wallet import Wallet
 from cardano.wallet import WalletService
-
 from cardano.backends.walletrest import WalletREST
 
-from m2_paypad_dbus import *
 from m2_util import *
+from m2_transaction import *
 
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gio, GLib, Gtk, GdkPixbuf
+gi.require_version('Soup', '2.4')
+from gi.repository import Gio, GLib, Gtk, GdkPixbuf, Soup
 
 ws = WalletService(WalletREST(port=8090))
 
 # Handle command line arguments
 parser = argparse.ArgumentParser(description='M2 Kiosk App for processing blockchain payments.')
-parser.add_argument('-p', '--odoo-port', help='specify Odoo port number')
+parser.add_argument('-t', '--test-mode', help='Start in test mode')
+parser.add_argument('-p', '--odoo-port', help='Specify Odoo port number')
 args = parser.parse_args(['--odoo-port', '8069'])
 
 odoo_port = args.odoo_port
@@ -38,157 +37,67 @@ headerbar.set_title("M2 PayPad")
 headerbar.set_show_close_button(False)
 window1.set_titlebar(headerbar)
 
-#window1.set_show_close_button(False)
 image1 = builder.get_object("image1")
-pixbuf = GdkPixbuf.Pixbuf.new_from_file('./static/default.png')
+pixbuf = GdkPixbuf.Pixbuf.new_from_file('./static/m2tec_logo_github.png')
 pixbuf = pixbuf.scale_simple(380, 380, GdkPixbuf.InterpType.BILINEAR)
-image1.set_from_pixbuf(pixbuf)   
+image1.set_from_pixbuf(pixbuf)
 
-def transactions(wallet_id, transaction_id):
-    wal0 = Wallet(wallet_id, backend=WalletREST(port=wallet_port))
-    wal0.sync_progress()
-    
-    wallet_balance = wal0.balance().total
-    #print(wal0.balance().total)
-    
-    tnxs = wal0.transactions()
-    
-    transact = []
-    
-    result = "OK"
-    
-    for tnx in tnxs:
-        tnx_dict = {'id': tnx.txid, 'fee': tnx.fee, 'input': tnx.amount_in, 'output': tnx.amount_out, 'metadata': tnx.metadata, 'status' : tnx.status}
-        
-        #print(dir(tnx))
-        #print(json.dumps(tnx, indent=4, sort_keys=False))
-        #print(repr(tnx_dict))
-        #print("\n")
-        #transact.append(tnx_dict)   
-        
-        metadata = tnx.metadata
-        #print(metadata.keys())
-        
-        tx_id = ''
-        
-        try:
-            tx_id = metadata[73]['title']
-            #print('tx_id: ' + str(tx_id))
-        except KeyError:
-            pass
-    
-        #print("tx_id = " + tx_id + " and transaction_id = " + transaction_id)
-        if tx_id != '' and tx_id == transaction_id:
-            print("success")
-            result = "success"          
-            
-    return result
-
-def confirm_payment(service_id):
-    TIMEOUT = 10
-    endpoint = 'http://localhost:' + odoo_port + '/pos_cardano/notification'
-    
-    headers = {
-        'Content-Type': 'application/json'
-    }
-
-    confirmation_data = {
-        "SaleToPOIResponse": {"PaymentResponse": {"Response": { "Result" : "Success"}, "PaymentResult" : { "AmountsResp" : "-",  "AmountsResp" : "-"} },
-                              "MessageHeader": {"MessageCategory": "Payment",
-                                                "MessageClass": "Service",
-                                                "MessageType": "Response",
-                                                "POIID": "Terminal1",
-                                                "ProtocolVersion": "3.0",
-                                                "SaleID": "x",
-                                                "ServiceID": service_id}}}
-    request_odoo = requests.post(endpoint, data=json.dumps(confirmation_data), headers=headers, timeout=TIMEOUT) 
-
-class Runner:
-    def __init__(self, num_times):
-        self.num_times = num_times
-        self.count = 0
-
-    def __call__(self, *args):
-        transaction_id = args[0]
-        service_id = args[1]
-        wallet_id = args[2]
-                        
-        result = transactions(wallet_id, transaction_id)
-        
-        print("result = "  + result )
-        if result == "success":
-            print("go to confirm payment")
-            confirm_payment(service_id)
-            self.count = self.num_times
-            
-        self.count += 1
-        print("Periodic timer [{}]: args={}".format(self.count, args))
-        
-        return self.count < self.num_times
-
-check_blockchain = Runner(100)
-
-def create_transaction_json(transaction_id, wallet_address, amount):
+payment_box = builder.get_object("payment_box")
 
 
-    print('shop code: ' + transaction_id + str(wallet_address) + str(amount))
-    metadata_dict = {
-        '123': {'message': transaction_id}
-    }
-        
-    amounts_dict_1 = {
-        'quantity': str(int(amount * 1000000)), 
-        'policyId': 'ada', 
-        'assetName': 'ada'
-    }
-    
-    amounts_list = [ amounts_dict_1 ]
-    
-    outputs_dict = { 
-        wallet_address : amounts_list
-    }
+# Handle payment request for the gamechanger wallet
+def gamechanger_payment_request(server, message, path, query, client_context, data):
+    print('-------- server callback ----------')
+    print(repr(message.request_body.data))
+    # print(data)
 
-    transaction_dict = {
-        'type': 'tx', 
-        'title': transaction_id, 
-        'outputs': outputs_dict,
-    }
+    json_dict = json.loads(message.request_body.data)
+    pprint(json_dict)
 
-    print(json.dumps(transaction_dict, indent=4, sort_keys=True))
-    
-    return json.dumps(transaction_dict)
+    transaction_id = json_dict["transaction_id"]
+    wallet_address = json_dict["wallet_address"]
+    pay_amount = json_dict["pay_amount"]
 
-def create_qr_code(transaction_id, wallet_address, amount ):
+    create_qr_code(transaction_id, wallet_address, pay_amount)
 
-    tx_json = create_transaction_json(transaction_id, wallet_address, amount)
-   
-    filename_qr_code = 'static/shop_qr_code-' + transaction_id + '.png'
-    print(filename_qr_code)    
-    
-    cardano_net = 'testnet'    
-    gc_cli = '/home/maarten/cardano-src/m2_kiosk_app/node_modules/gamechanger-dapp-cli/cli.js'
-    command_list = [gc_cli, cardano_net, 'build', 'qr', '-a', tx_json, '-o', filename_qr_code]
-    result = subprocess.run(command_list, stdout=subprocess.PIPE)
+    qr_code_file_name = 'static/shop_qr_code-' + transaction_id + '.png'
+    pixbuf = GdkPixbuf.Pixbuf.new_from_file(qr_code_file_name)
+    pixbuf = pixbuf.scale_simple(380, 380, GdkPixbuf.InterpType.BILINEAR)
+    image1.set_from_pixbuf(pixbuf)
+
+    amount_label.set_text("{:.2f}".format(pay_amount))
+    payment_box.show()
+    message.set_status(200)
+
+
+# Handle payment request for the gamechanger wallet
+def clear_display_request(server, message, path, query, client_context, data):
+    payment_box.hide()
+
+    pixbuf2 = GdkPixbuf.Pixbuf.new_from_file('./static/m2tec_logo_github.png')
+    pixbuf2 = pixbuf.scale_simple(380, 380, GdkPixbuf.InterpType.BILINEAR)
+    print('Setting pixbuf')
+    image1.set_from_pixbuf(pixbuf2)
+
+    message.set_status(200)
+
 
 if __name__ == "__main__":
 
-    check_odoo_and_cardano(odoo_port, wallet_port)
-
-    check_cardano_wallets(ws)
+    # Check if everything is running
+    #check_odoo_and_cardano(odoo_port, wallet_port)
+    #check_cardano_wallets(ws)
     
-    # Start a system message bus for the paypad
-    owner_id = Gio.bus_own_name(
-        Gio.BusType.SYSTEM,  
-        "org.m2tec.paypad",  
-        Gio.BusNameOwnerFlags.NONE,  
-        on_bus_acquired,
-        on_name_acquired,
-        on_name_lost,
-    )
-    
+    # Create a server to listen to requests
+    server = Soup.Server()
+    server.listen_local(9090, Soup.ServerListenOptions(0))
+    data = ''
+    server.add_handler("/gamechanger-payment", gamechanger_payment_request, data)
+    server.add_handler("/clear-display", clear_display_request, data)
     window1.show_all()
+    payment_box.hide()
 
-    Gtk.main() 
-    Gio.bus_unown_name(owner_id)
+    Gtk.main()
+
     print("Exiting...")
 

@@ -12,12 +12,10 @@
       <placeholder/>
     </child>
     <child>
-      <object class="GtkBox">
-        <property name="visible">True</property>
+      <object class="GtkBox" id="main-box">
         <property name="can_focus">False</property>
         <child>
-          <object class="GtkBox">
-            <property name="visible">True</property>
+          <object class="GtkBox" id="payment_box">
             <property name="can_focus">False</property>
             <property name="margin_left">15</property>
             <property name="margin_right">15</property>
@@ -166,6 +164,7 @@ to scan the qr-code</property>
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
+            <property name="pack_type">end</property>
             <property name="position">1</property>
           </packing>
         </child>
