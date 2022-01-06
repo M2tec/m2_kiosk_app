@@ -46,7 +46,7 @@ payment_box = builder.get_object("payment_box")
 
 
 # Handle payment request for the gamechanger wallet
-def gamechanger_payment_request(server, message, path, query, client_context, data):
+def payment_request(server, message, path, query, client_context, data):
     print('-------- server callback ----------')
     print(repr(message.request_body.data))
     # print(data)
@@ -56,7 +56,7 @@ def gamechanger_payment_request(server, message, path, query, client_context, da
 
     transaction_id = json_dict["transaction_id"]
     wallet_address = json_dict["wallet_address"]
-    pay_amount = json_dict["pay_amount"]
+    pay_amount = json_dict["requested_amount"]
 
     create_qr_code(transaction_id, wallet_address, pay_amount)
 
@@ -92,7 +92,7 @@ if __name__ == "__main__":
     server = Soup.Server()
     server.listen_local(9090, Soup.ServerListenOptions(0))
     data = ''
-    server.add_handler("/gamechanger-payment", gamechanger_payment_request, data)
+    server.add_handler("/payment-request", payment_request, data)
     server.add_handler("/clear-display", clear_display_request, data)
     window1.show_all()
     payment_box.hide()
