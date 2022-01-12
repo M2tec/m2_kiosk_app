@@ -23,6 +23,7 @@ def cardano_transaction_json(transaction_id, wallet_address, amount):
     transaction_dict = {
         'type': 'tx',
         'title': transaction_id,
+        'description' : 'M2tec POS transaction',
         'outputs': outputs_dict,
     }
 
@@ -35,7 +36,7 @@ def create_qr_code(transaction_id, wallet_address, amount):
     tx_json = cardano_transaction_json(transaction_id, wallet_address, amount)
 
     filename_qr_code = 'static/shop_qr_code-' + transaction_id + '.png'
-    print(filename_qr_code)
+    #print(filename_qr_code)
 
     cardano_net = 'testnet'
     gc_cli = '/home/maarten/cardano-src/m2_kiosk_app/node_modules/gamechanger-dapp-cli/cli.js'
