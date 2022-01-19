@@ -5,10 +5,6 @@ import gi
 import json
 from pprint import pprint
 
-from cardano.wallet import Wallet
-from cardano.wallet import WalletService
-from cardano.backends.walletrest import WalletREST
-
 from m2_util import *
 from m2_transaction import *
 
@@ -16,7 +12,6 @@ gi.require_version("Gtk", "3.0")
 gi.require_version('Soup', '2.4')
 from gi.repository import Gio, GLib, Gtk, GdkPixbuf, Soup
 
-ws = WalletService(WalletREST(port=8090))
 
 # Handle command line arguments
 parser = argparse.ArgumentParser(description='M2 Kiosk App for processing blockchain payments.')
@@ -28,7 +23,7 @@ odoo_port = args.odoo_port
 wallet_port = 8090
 
 builder = Gtk.Builder()
-builder.add_from_file("paypad.glade")
+builder.add_from_file("/usr/share/m2-kiosk-app/paypad.glade")
 amount_label = builder.get_object("amount_label")
 window1 = builder.get_object("window1")
 
@@ -38,7 +33,7 @@ headerbar.set_show_close_button(False)
 window1.set_titlebar(headerbar)
 
 image1 = builder.get_object("image1")
-pixbuf = GdkPixbuf.Pixbuf.new_from_file('./static/m2tec_logo_github.png')
+pixbuf = GdkPixbuf.Pixbuf.new_from_file('/usr/share/m2-kiosk-app/static/m2tec_logo_github.png')
 pixbuf = pixbuf.scale_simple(380, 380, GdkPixbuf.InterpType.BILINEAR)
 image1.set_from_pixbuf(pixbuf)
 
@@ -48,8 +43,6 @@ payment_box = builder.get_object("payment_box")
 # Handle payment request for the gamechanger wallet
 def payment_request(server, message, path, query, client_context, data):
     print('-------- server callback ----------')
-    #print(repr(message.request_body.data))
-    # print(data)
 
     json_dict = json.loads(message.request_body.data)
     #pprint(json_dict)
@@ -60,7 +53,8 @@ def payment_request(server, message, path, query, client_context, data):
 
     create_qr_code(transaction_id, wallet_address, pay_amount)
 
-    qr_code_file_name = 'static/shop_qr_code-' + transaction_id + '.png'
+
+    qr_code_file_name = '/tmp/shop_qr_code-' + transaction_id + '.png'
     pixbuf = GdkPixbuf.Pixbuf.new_from_file(qr_code_file_name)
     pixbuf = pixbuf.scale_simple(380, 380, GdkPixbuf.InterpType.BILINEAR)
     image1.set_from_pixbuf(pixbuf)
@@ -74,7 +68,7 @@ def payment_request(server, message, path, query, client_context, data):
 def clear_display_request(server, message, path, query, client_context, data):
     payment_box.hide()
 
-    pixbuf2 = GdkPixbuf.Pixbuf.new_from_file('./static/m2tec_logo_github.png')
+    pixbuf2 = GdkPixbuf.Pixbuf.new_from_file('/usr/share/m2-kiosk-app/static/m2tec_logo_github.png')
     pixbuf2 = pixbuf.scale_simple(380, 380, GdkPixbuf.InterpType.BILINEAR)
     #print('Setting pixbuf')
     image1.set_from_pixbuf(pixbuf2)
@@ -87,7 +81,7 @@ if __name__ == "__main__":
     # Check if everything is running
     #check_odoo_and_cardano(odoo_port, wallet_port)
     #check_cardano_wallets(ws)
-    
+
     # Create a server to listen to requests
     server = Soup.Server()
     server.listen_local(9090, Soup.ServerListenOptions(0))
