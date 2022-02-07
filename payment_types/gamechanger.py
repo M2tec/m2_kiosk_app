@@ -1,9 +1,9 @@
 import json
 import subprocess
-
+import requests
+from pprint import pprint
 
 def cardano_transaction_json(transaction_id, wallet_address, amount):
-    print('shop code: ' + transaction_id + str(wallet_address) + str(amount))
     metadata_dict = {
         '123': {'message': transaction_id}
     }
@@ -32,13 +32,20 @@ def cardano_transaction_json(transaction_id, wallet_address, amount):
     return json.dumps(transaction_dict)
 
 
-def create_qr_code(transaction_id, wallet_address, amount):
+def qr_code(qr_code_file_name, transaction_id, wallet_address, amount):
     tx_json = cardano_transaction_json(transaction_id, wallet_address, amount)
 
-    filename_qr_code = 'static/shop_qr_code-' + transaction_id + '.png'
-    #print(filename_qr_code)
+    print(qr_code_file_name)
 
     cardano_net = 'testnet'
     gc_cli = '/home/maarten/cardano-src/m2_kiosk_app/node_modules/gamechanger-dapp-cli/cli.js'
-    command_list = [gc_cli, cardano_net, 'build', 'qr', '-a', tx_json, '-o', filename_qr_code]
+    command_list = [gc_cli, cardano_net, 'build', 'qr', '-a', tx_json, '-o', qr_code_file_name]
     result = subprocess.run(command_list, stdout=subprocess.PIPE)
+    
+
+
+
+
+
+  
+    

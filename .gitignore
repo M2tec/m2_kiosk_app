@@ -6,4 +6,5 @@ package-lock.json
 *~
 /static
 /.idea
-/__pycache__
+__pycache__/
+*.py[cod]
