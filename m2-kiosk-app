@@ -6,6 +6,8 @@ import json
 import requests
 from pprint import pprint
 
+from escpos.printer import Usb
+
 from m2_util import *
 from payment_types import *
 from payment_validators import *
@@ -13,6 +15,12 @@ from payment_validators import *
 gi.require_version("Gtk", "3.0")
 gi.require_version('Soup', '2.4')
 from gi.repository import Gio, GLib, Gtk, GdkPixbuf, Soup
+
+from cardano.wallet import Wallet
+from cardano.wallet import WalletService
+from cardano.backends.walletrest import WalletREST
+ws = WalletService(WalletREST(port=8090))
+
 
 # Handle command line arguments
 parser = argparse.ArgumentParser(description='M2 Kiosk App for processing blockchain payments.')
@@ -40,11 +48,132 @@ image1.set_from_pixbuf(pixbuf)
 
 payment_box = builder.get_object("payment_box")
 
-
 f = open('m2_config.json')
 config_data = json.load(f)
 f.close()
 #print("\n--- config data ---: \n" + pprint(str(config_data)))
+
+""" Seiko Epson Corp. Receipt Printer (EPSON TM-T20III) """
+p = Usb(0x04b8, 0x0e28, 0, profile="TM-T20III")
+
+def print_line():
+    p.text('\n')
+    p.set(underline=1)
+    p.text("{:<48}".format(' '))
+    p.text('\n')    
+    p.set(underline=0)
+
+def print_receipt(data):
+    
+    #pprint(data) 
+       
+    p.hw('RESET')
+    
+    # Print heading   
+    p.image('m2tec_logo.jpg', center=True)
+    p.text('\n')
+    # Location data
+    p.set(align='center')
+    p.text(data['company']['name'] + '\n')
+    p.text(data['company']['phone'] + '\n')
+    p.text(data['company']['email'] + '\n')
+    p.text(data['company']['website'])    
+
+    p.set(align='left')
+    print_line()
+        
+    # Print order lines
+    
+    order_lines = data['orderlines']
+    #print(order_lines)
+    
+    mnemonic = ''
+    
+    for line in order_lines:
+        #print('\norder line')
+        #print(line)
+        name = line['product_name']
+        qty = str(line['quantity'])
+        price = str("{:.2f}".format(line['price']))
+        
+        # Generate BIP39 recovery phrase
+        if name == 'Paper wallet':
+            print('-------- paper wallet --------')
+            command_list = ['cardano-wallet', 'recovery-phrase', 'generate']
+
+            with subprocess.Popen(command_list, stdout=subprocess.PIPE) as proc:
+                mnemonic = proc.stdout.read().decode('UTF-8').rstrip()
+                print(mnemonic)  
+                  
+        # TM-T20III can print 48 characters on one line      
+        # Pad elements with format for correct allignment 
+        if line['quantity'] == 1:
+            p.text(name[:36].ljust(36, ' '))
+            p.text(price.rjust(12, ' '))
+        else:
+            #p.text("{:<36}".format(str(line['name'][:36])) + '\n')
+            p.text("{:<36}".format(str(name[:36])))
+            total_line_price = str("{:.2f}".format(line['quantity'] * line['price']))
+            p.text(total_line_price.rjust(12, ' ')) 
+            p.text('    '  + qty + ' x ' + price + '\n')
+                         
+    print_line()
+    
+    # Print totals     
+    p.text('\n')    
+    p.text('Subtotal'.ljust(36, ' '))
+    p.text(str(data['subtotal']).rjust(12, ' '))
+ 
+    p.text(str(data['company']['vat_label']).ljust(36, ' '))
+    p.text(str(data['total_tax']).rjust(12, ' '))    
+    
+    print_line()
+
+    p.text('TOTAL'.ljust(36, ' '))
+    p.text(str("{:.2f}".format(data['total_with_tax'])).rjust(12, ' '))        
+    p.text('\n')  
+    p.text('\n')  
+            
+    if mnemonic != '':
+        print_line()
+        p.text('Paper wallet')
+        print_line()
+       
+        p.text('Recovery phrase\n')
+        
+        mnemonic_list = mnemonic.split(' ')
+        for i in range(0,6):
+            #print(mnemonic_list[i::4])
+            part_of_list = mnemonic_list[i::6]
+            
+            for word in part_of_list:
+                p.text(word.ljust(10, ' '))
+            p.text('\n')    
+        
+        print_line()
+                
+        wallet_id = ws.create_wallet(
+                    name="M2tec wallet",
+                    mnemonic=mnemonic,
+                    passphrase="1234567890")    
+
+        wal = Wallet(wallet_id, backend=WalletREST(port=wallet_port))
+        
+        #import time
+        #while wal.sync_progress() < 1.0:
+        #    time.sleep(1)
+            
+        cardano_address = wal.addresses()[0]
+        
+        p.text('Receive address\n')
+        p.text(cardano_address)
+        
+        print_line()
+        p.text('Receive address QR-code\n')   
+        p.qr(cardano_address, center=True, size=8 )
+        
+    # Print footer
+    p.cut()
 
 # Handle payment request for the gamechanger wallet
 def payment_request(server, message, path, query, client_context, data):
@@ -53,8 +182,10 @@ def payment_request(server, message, path, query, client_context, data):
     json_dict = json.loads(message.request_body.data)
     #pprint(json_dict)
 
-    transaction_id = json_dict["transaction_id"]
-    pay_amount = json_dict["requested_amount"]
+    transaction_id = json_dict["name"].split(' ')[1]
+    pay_amount = json_dict["total_with_tax"]
+
+    print_receipt(json_dict)
     
     wallet_address = config_data["cardano"]["wallet_testnet_address"]
  
@@ -84,8 +215,8 @@ def payment_status(server, message, path, query, client_context, data):
     network_type = config_data["cardano"]["network_type"]
     wallet_address = config_data["cardano"]["wallet_testnet_address"]
 
-    payment_status = koios.payment_validate(network_type, transaction_id, wallet_address, requested_amount)
-    #payment_status = dummy.payment_validate(network_type, transaction_id, wallet_address, requested_amount)
+    #payment_status = koios.payment_validate(network_type, transaction_id, wallet_address, requested_amount)
+    payment_status = dummy.payment_validate(network_type, transaction_id, wallet_address, requested_amount)
     
     print("Koios return: " + repr(payment_status))
 
