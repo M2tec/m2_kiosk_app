@@ -1,38 +1,38 @@
-#!/bin/python3
-
+#!/usr/bin/python3
+import os
 import argparse
-import gi
+
 import json
 import requests
 from pprint import pprint
 
 from escpos.printer import Usb
+from escpos import exceptions
 
 from m2_util import *
 from payment_types import *
 from payment_validators import *
 
+import gi
+gi.require_version('Gdk', '3.0')
 gi.require_version("Gtk", "3.0")
 gi.require_version('Soup', '2.4')
-from gi.repository import Gio, GLib, Gtk, GdkPixbuf, Soup
+from gi.repository import Gio, GLib, Gdk, Gtk, GdkPixbuf, Soup
 
-from cardano.wallet import Wallet
-from cardano.wallet import WalletService
-from cardano.backends.walletrest import WalletREST
-ws = WalletService(WalletREST(port=8090))
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Root
 
 
 # Handle command line arguments
 parser = argparse.ArgumentParser(description='M2 Kiosk App for processing blockchain payments.')
 parser.add_argument('-t', '--test-mode', help='Start in test mode')
-parser.add_argument('-p', '--odoo-port', help='Specify Odoo port number')
-args = parser.parse_args(['--odoo-port', '8069'])
+parser.add_argument('-p', '--odoo-port', help='Specify Odoo port number', default='8069')
+args = parser.parse_args()
 
 odoo_port = args.odoo_port
 wallet_port = 8090
 
 builder = Gtk.Builder()
-builder.add_from_file("/usr/share/m2-kiosk-app/paypad.glade")
+builder.add_from_file(ROOT_DIR + "/paypad.glade")
 amount_label = builder.get_object("amount_label")
 window1 = builder.get_object("window1")
 
@@ -42,19 +42,39 @@ headerbar.set_show_close_button(False)
 window1.set_titlebar(headerbar)
 
 image1 = builder.get_object("image1")
-pixbuf = GdkPixbuf.Pixbuf.new_from_file('/usr/share/m2-kiosk-app/static/m2tec_logo_github.png')
+pixbuf = GdkPixbuf.Pixbuf.new_from_file(ROOT_DIR + '/static/m2tec_logo_github.png')
 pixbuf = pixbuf.scale_simple(380, 380, GdkPixbuf.InterpType.BILINEAR)
 image1.set_from_pixbuf(pixbuf)
 
 payment_box = builder.get_object("payment_box")
 
-f = open('m2_config.json')
+f = open(ROOT_DIR + '/m2_config.json')
 config_data = json.load(f)
 f.close()
 #print("\n--- config data ---: \n" + pprint(str(config_data)))
 
-""" Seiko Epson Corp. Receipt Printer (EPSON TM-T20III) """
-p = Usb(0x04b8, 0x0e28, 0, profile="TM-T20III")
+printer_available = False 
+
+#try:
+#    """ Seiko Epson Corp. Receipt Printer (EPSON TM-T20III) """
+#    p = Usb(0x04b8, 0x0e28, 0, profile="TM-T20III")
+#    printer_available = True 
+#except exceptions.USBNotFoundError:
+#    print("Receipt printer not found")
+#    printer_available = False 
+#    pass
+
+def fullscreen_at_monitor(window, n):
+    display = Gdk.Display.get_default()
+    monitor = Gdk.Display.get_monitor(display, n)
+    geometry = monitor.get_geometry()
+    x = geometry.x
+    y = geometry.y
+
+    print(str(x) + ' x ' + str(y))
+    window.move(x,y)
+    window.fullscreen()
+    window.Decorated = False
 
 def print_line():
     p.text('\n')
@@ -133,117 +153,134 @@ def print_receipt(data):
     p.text(str("{:.2f}".format(data['total_with_tax'])).rjust(12, ' '))        
     p.text('\n')  
     p.text('\n')  
-            
-    if mnemonic != '':
-        print_line()
-        p.text('Paper wallet')
-        print_line()
-       
-        p.text('Recovery phrase\n')
-        
-        mnemonic_list = mnemonic.split(' ')
-        for i in range(0,6):
-            #print(mnemonic_list[i::4])
-            part_of_list = mnemonic_list[i::6]
-            
-            for word in part_of_list:
-                p.text(word.ljust(10, ' '))
-            p.text('\n')    
-        
-        print_line()
-                
-        wallet_id = ws.create_wallet(
-                    name="M2tec wallet",
-                    mnemonic=mnemonic,
-                    passphrase="1234567890")    
 
-        wal = Wallet(wallet_id, backend=WalletREST(port=wallet_port))
-        
-        #import time
-        #while wal.sync_progress() < 1.0:
-        #    time.sleep(1)
-            
-        cardano_address = wal.addresses()[0]
-        
-        p.text('Receive address\n')
-        p.text(cardano_address)
-        
-        print_line()
-        p.text('Receive address QR-code\n')   
-        p.qr(cardano_address, center=True, size=8 )
-        
     # Print footer
     p.cut()
+
+def check_cors_origin(message):
+    # Set the cors header
+    pprint((message.request_headers.get_list("Origin")))
+
+    # Match origin to localhost
+    allow_list = ['m2-paypad', 'localhost', '127.0.0.1', 'm2paypad.home']
+    origin = message.request_headers.get_list("Origin")
+
+    cors_local_url = ""
+
+    for allow_url in allow_list:
+        if allow_url in origin:
+            #cors_local_url = "http://" + allow_url + ":5000"
+            cors_local_url = "http://" + allow_url
+
+    return cors_local_url
+
 
 # Handle payment request for the gamechanger wallet
 def payment_request(server, message, path, query, client_context, data):
     print('-------- payment request ----------')
 
-    json_dict = json.loads(message.request_body.data)
-    #pprint(json_dict)
+    try:
+        json_dict = json.loads(message.request_body.data)
+        # pprint(json_dict)
+    except json.decoder.JSONDecodeError:
+        print('json.decoder.JSONDecodeError')
+        return
 
     transaction_id = json_dict["name"].split(' ')[1]
-    pay_amount = json_dict["total_with_tax"]
+    requested_amount = float(json_dict["total_with_tax"])
+    wallet_address = json_dict["wallet_address"]
 
-    print_receipt(json_dict)
-    
-    wallet_address = config_data["cardano"]["wallet_testnet_address"]
- 
+    #if printer_available:
+    #    print_receipt(json_dict)
+
+    #wallet_address = config_data["cardano"]["wallet_testnet_address"]
+
     # Create a Gamechanger QR-code
-    qr_code_file_name = '/tmp/shop_qr_code-' + transaction_id + '.png'
-    gamechanger.qr_code(qr_code_file_name, transaction_id, wallet_address, pay_amount)
+    qr_code_file_name = 'shop_qr_code-' + transaction_id + '.png'
+    # print(qr_code_file_name)
+
+    gamechanger.qr_code(qr_code_file_name, transaction_id, wallet_address, int(requested_amount * 1000000))
 
     # Update kiosk display
     pixbuf = GdkPixbuf.Pixbuf.new_from_file(qr_code_file_name)
     pixbuf = pixbuf.scale_simple(380, 380, GdkPixbuf.InterpType.BILINEAR)
     image1.set_from_pixbuf(pixbuf)
 
-    amount_label.set_text("{:.2f}".format(pay_amount))
+    #requested_amount = int(requested_amount) / 1000000
+    amount_label.set_text("{:.2f}".format(requested_amount))
     payment_box.show()
-    
+
+    cors_local_url = check_cors_origin(message)
+
+    message.response_headers.append("Access-Control-Allow-Origin", cors_local_url);
+
+    #message.response_headers.append("Access-Control-Allow-Origin", "*");
     message.set_status(200)
+
 
 # Handle payment status for the gamechanger wallet
 def payment_status(server, message, path, query, client_context, data):
     print('-------- payment status ----------')
 
-    json_dict = json.loads(message.request_body.data)
-    transaction_id = json_dict["transaction_id"]
-    requested_amount = json_dict["requested_amount"]
+    try:
+        json_dict = json.loads(message.request_body.data)
+        #pprint(json_dict)
+    except json.decoder.JSONDecodeError:
+        print('json.decoder.JSONDecodeError')
+        return
 
-    print("--- config data ---: " + repr(config_data))
-    network_type = config_data["cardano"]["network_type"]
-    wallet_address = config_data["cardano"]["wallet_testnet_address"]
+    transaction_id = json_dict["name"].split(' ')[1]
+    requested_amount = json_dict["total_with_tax"]
+    wallet_address = json_dict["wallet_address"]
+    network_type = json_dict["network_type"]
 
-    #payment_status = koios.payment_validate(network_type, transaction_id, wallet_address, requested_amount)
-    payment_status = dummy.payment_validate(network_type, transaction_id, wallet_address, requested_amount)
-    
+    payment_status = koios.payment_validate(network_type, transaction_id, wallet_address, requested_amount)
+    #payment_status = dummy.payment_validate(network_type, transaction_id, wallet_address, requested_amount)
+
     print("Koios return: " + repr(payment_status))
 
-    tx_json = { "network_type" : network_type, 
+    tx_json = { "network_type" : network_type,
                 "transaction_id" : transaction_id,
                 "wallet_address" : wallet_address,
                 "requested_amount": requested_amount,
                 "payment_status": payment_status
                }
 
-    # Send answer to Odoo
-    base_url = "http://localhost:8069"
-    url = base_url + "/pos_cardano/notification"
-    headers = {'Content-type': 'application/json'}                    
-    r = requests.post(url, headers=headers, json=tx_json)
-            
-    message.set_status(200)
+    cors_local_url = check_cors_origin(message)
+
+    message.response_headers.append("Access-Control-Allow-Origin", cors_local_url);
+    print("Cors local url: \t" + cors_local_url)
+    # Send answer to paypad
+
+    message.set_status_full(200, payment_status)
+    message.set_response('text/plain', Soup.MemoryUse.COPY, payment_status.encode('utf-8'))
 
 
-# Handle payment request for the gamechanger wallet
+# Handle payment request to clear the window
 def clear_display_request(server, message, path, query, client_context, data):
     payment_box.hide()
 
-    pixbuf2 = GdkPixbuf.Pixbuf.new_from_file('/usr/share/m2-kiosk-app/static/m2tec_logo_github.png')
+    pixbuf2 = GdkPixbuf.Pixbuf.new_from_file(ROOT_DIR + '/static/m2tec_logo_github.png')
     pixbuf2 = pixbuf.scale_simple(380, 380, GdkPixbuf.InterpType.BILINEAR)
     #print('Setting pixbuf')
     image1.set_from_pixbuf(pixbuf2)
+
+    # Match origin to localhost
+    allow_list = ['m2-paypad', 'localhost', '127.0.0.1', 'm2paypad.home']
+    origin = message.request_headers.get_list("Origin") 
+
+    cors_local_url = ""
+    
+    for allow_url in allow_list:
+        if allow_url in origin:
+            cors_local_url = "http://" + allow_url + ":5000"
+
+    cors_local_url = check_cors_origin(message)
+
+
+    message.response_headers.append("Access-Control-Allow-Origin", cors_local_url);
+    print("Cors local url: \t" + cors_local_url)
+    # Send answer to paypad
 
     message.set_status(200)
 
@@ -256,12 +293,15 @@ if __name__ == "__main__":
 
     # Create a server to listen to requests
     server = Soup.Server()
-    server.listen_local(9090, Soup.ServerListenOptions(0))
+    server.listen_all(9090, Soup.ServerListenOptions(0))
     data = ''
     server.add_handler("/payment-request", payment_request, data)
     server.add_handler("/payment-status", payment_status, data)    
     server.add_handler("/clear-display", clear_display_request, data)
     window1.show_all()
+    
+    fullscreen_at_monitor(window1, 0)
+    
     payment_box.hide()
 
     Gtk.main()

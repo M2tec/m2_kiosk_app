@@ -7,9 +7,8 @@ def cardano_transaction_json(transaction_id, wallet_address, amount):
     metadata_dict = {
         '123': {'message': transaction_id}
     }
-
     amounts_dict_1 = {
-        'quantity': str(int(amount * 1000000)),
+        'quantity': str(int(amount)),
         'policyId': 'ada',
         'assetName': 'ada'
     }
@@ -27,19 +26,23 @@ def cardano_transaction_json(transaction_id, wallet_address, amount):
         'outputs': outputs_dict,
     }
 
-    print(json.dumps(transaction_dict, indent=4, sort_keys=True))
+    #print(json.dumps(transaction_dict, indent=4, sort_keys=True))
 
     return json.dumps(transaction_dict)
 
 
 def qr_code(qr_code_file_name, transaction_id, wallet_address, amount):
+    print('-------- qr_code ----------')
     tx_json = cardano_transaction_json(transaction_id, wallet_address, amount)
-
-    print(qr_code_file_name)
-
+    print()
+    print(tx_json)
+    print(type(tx_json))
+    
     cardano_net = 'testnet'
-    gc_cli = '/home/maarten/cardano-src/m2_kiosk_app/node_modules/gamechanger-dapp-cli/cli.js'
-    command_list = [gc_cli, cardano_net, 'build', 'qr', '-a', tx_json, '-o', qr_code_file_name]
+    gc_cli = 'gamechanger-dapp-cli'
+    command_list = [gc_cli, cardano_net, 'build', '--template', 'printable', 'qr', '-a', tx_json, '-o', qr_code_file_name]
+    command_string = ' '.join(command_list)
+    print(command_string)
     result = subprocess.run(command_list, stdout=subprocess.PIPE)
     
 
