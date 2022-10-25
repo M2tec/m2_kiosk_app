@@ -4,7 +4,6 @@ mnemonic.txt
 /node_modules
 package-lock.json
 *~
-/static
 /.idea
 __pycache__/
 *.py[cod]
