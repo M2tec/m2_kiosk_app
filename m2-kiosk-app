@@ -181,24 +181,19 @@ def payment_request(server, message, path, query, client_context, data):
 
     try:
         json_dict = json.loads(message.request_body.data)
-        # pprint(json_dict)
+        print()
+        pprint(repr(json_dict))
+        print()
     except json.decoder.JSONDecodeError:
         print('json.decoder.JSONDecodeError')
         return
 
-    transaction_id = json_dict["name"].split(' ')[1]
-    requested_amount = float(json_dict["total_with_tax"])
+    transaction_id = str(json_dict["transaction_id"])
+    requested_amount = float(json_dict["amount"])
     wallet_address = json_dict["wallet_address"]
 
-    #if printer_available:
-    #    print_receipt(json_dict)
-
-    #wallet_address = config_data["cardano"]["wallet_testnet_address"]
-
     # Create a Gamechanger QR-code
-    qr_code_file_name = 'shop_qr_code-' + transaction_id + '.png'
-    # print(qr_code_file_name)
-
+    qr_code_file_name = '/tmp/shop_qr_code-' + transaction_id + '.png'
     gamechanger.qr_code(qr_code_file_name, transaction_id, wallet_address, int(requested_amount * 1000000))
 
     # Update kiosk display
@@ -224,13 +219,13 @@ def payment_status(server, message, path, query, client_context, data):
 
     try:
         json_dict = json.loads(message.request_body.data)
-        #pprint(json_dict)
+        pprint(json_dict)
     except json.decoder.JSONDecodeError:
         print('json.decoder.JSONDecodeError')
         return
 
-    transaction_id = json_dict["name"].split(' ')[1]
-    requested_amount = json_dict["total_with_tax"]
+    transaction_id = json_dict["transaction_id"]
+    requested_amount = json_dict["amount"]
     wallet_address = json_dict["wallet_address"]
     network_type = json_dict["network_type"]
 
@@ -300,7 +295,7 @@ if __name__ == "__main__":
     server.add_handler("/clear-display", clear_display_request, data)
     window1.show_all()
     
-    fullscreen_at_monitor(window1, 0)
+    #fullscreen_at_monitor(window1, 0)
     
     payment_box.hide()
 
