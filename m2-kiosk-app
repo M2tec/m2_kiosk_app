@@ -6,9 +6,6 @@ import json
 import requests
 from pprint import pprint
 
-from escpos.printer import Usb
-from escpos import exceptions
-
 from m2_util import *
 from payment_types import *
 from payment_validators import *
@@ -53,7 +50,6 @@ config_data = json.load(f)
 f.close()
 #print("\n--- config data ---: \n" + pprint(str(config_data)))
 
-printer_available = False 
 
 #try:
 #    """ Seiko Epson Corp. Receipt Printer (EPSON TM-T20III) """
@@ -75,87 +71,6 @@ def fullscreen_at_monitor(window, n):
     window.move(x,y)
     window.fullscreen()
     window.Decorated = False
-
-def print_line():
-    p.text('\n')
-    p.set(underline=1)
-    p.text("{:<48}".format(' '))
-    p.text('\n')    
-    p.set(underline=0)
-
-def print_receipt(data):
-    
-    #pprint(data) 
-       
-    p.hw('RESET')
-    
-    # Print heading   
-    p.image('m2tec_logo.jpg', center=True)
-    p.text('\n')
-    # Location data
-    p.set(align='center')
-    p.text(data['company']['name'] + '\n')
-    p.text(data['company']['phone'] + '\n')
-    p.text(data['company']['email'] + '\n')
-    p.text(data['company']['website'])    
-
-    p.set(align='left')
-    print_line()
-        
-    # Print order lines
-    
-    order_lines = data['orderlines']
-    #print(order_lines)
-    
-    mnemonic = ''
-    
-    for line in order_lines:
-        #print('\norder line')
-        #print(line)
-        name = line['product_name']
-        qty = str(line['quantity'])
-        price = str("{:.2f}".format(line['price']))
-        
-        # Generate BIP39 recovery phrase
-        if name == 'Paper wallet':
-            print('-------- paper wallet --------')
-            command_list = ['cardano-wallet', 'recovery-phrase', 'generate']
-
-            with subprocess.Popen(command_list, stdout=subprocess.PIPE) as proc:
-                mnemonic = proc.stdout.read().decode('UTF-8').rstrip()
-                print(mnemonic)  
-                  
-        # TM-T20III can print 48 characters on one line      
-        # Pad elements with format for correct allignment 
-        if line['quantity'] == 1:
-            p.text(name[:36].ljust(36, ' '))
-            p.text(price.rjust(12, ' '))
-        else:
-            #p.text("{:<36}".format(str(line['name'][:36])) + '\n')
-            p.text("{:<36}".format(str(name[:36])))
-            total_line_price = str("{:.2f}".format(line['quantity'] * line['price']))
-            p.text(total_line_price.rjust(12, ' ')) 
-            p.text('    '  + qty + ' x ' + price + '\n')
-                         
-    print_line()
-    
-    # Print totals     
-    p.text('\n')    
-    p.text('Subtotal'.ljust(36, ' '))
-    p.text(str(data['subtotal']).rjust(12, ' '))
- 
-    p.text(str(data['company']['vat_label']).ljust(36, ' '))
-    p.text(str(data['total_tax']).rjust(12, ' '))    
-    
-    print_line()
-
-    p.text('TOTAL'.ljust(36, ' '))
-    p.text(str("{:.2f}".format(data['total_with_tax'])).rjust(12, ' '))        
-    p.text('\n')  
-    p.text('\n')  
-
-    # Print footer
-    p.cut()
 
 def check_cors_origin(message):
     # Set the cors header
