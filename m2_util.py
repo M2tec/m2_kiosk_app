@@ -1,7 +1,19 @@
-
+import os
 import secrets
 import string
 import subprocess
+
+
+import gi
+gi.require_version('GdkPixbuf', '2.0')
+from gi.repository import GdkPixbuf
+
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Root
+
+def set_payment_image(image1, image_file=ROOT_DIR + '/static/m2tec_logo_github.png'):
+    pixbuf = GdkPixbuf.Pixbuf.new_from_file(image_file)
+    pixbuf = pixbuf.scale_simple(380, 380, GdkPixbuf.InterpType.BILINEAR)
+    image1.set_from_pixbuf(pixbuf)
 
 
 def is_port_in_use(port):

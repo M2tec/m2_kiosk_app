@@ -32,17 +32,17 @@ def cardano_transaction_json(transaction_id, wallet_address, amount):
 
 
 def qr_code(qr_code_file_name, transaction_id, wallet_address, amount):
-    print('-------- qr_code ----------')
+    #print('-------- qr_code ----------')
     tx_json = cardano_transaction_json(transaction_id, wallet_address, amount)
-    print()
-    print(tx_json)
-    print(type(tx_json))
+    #print()
+    #print(tx_json)
+    #print(type(tx_json))
     
     cardano_net = 'testnet'
     gc_cli = 'gamechanger-dapp-cli'
     command_list = [gc_cli, cardano_net, 'build', '--template', 'printable', 'qr', '-a', tx_json, '-o', qr_code_file_name]
     command_string = ' '.join(command_list)
-    print(command_string)
+    #print(command_string)
     result = subprocess.run(command_list, stdout=subprocess.PIPE)
     
 
