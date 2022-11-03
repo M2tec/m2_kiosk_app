@@ -155,6 +155,8 @@ if __name__ == "__main__":
 
     #fullscreen_at_monitor(window1, 0)
 
+    window1.connect('destroy', gtk.main_quit)
+
     Gtk.main()
 
     print("Exiting...")
