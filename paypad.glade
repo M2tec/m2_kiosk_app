@@ -176,23 +176,24 @@ to scan the qr-code</property>
     </child>
   </object>
   <object class="GtkWindow" id="window2">
+    <property name="width-request">700</property>
+    <property name="height-request">400</property>
     <property name="can-focus">False</property>
     <child>
       <!-- n-columns=3 n-rows=4 -->
       <object class="GtkGrid" id="pinpad_grid">
-        <property name="width-request">380</property>
-        <property name="height-request">380</property>
         <property name="visible">True</property>
         <property name="can-focus">False</property>
-        <property name="margin-start">15</property>
-        <property name="margin-end">15</property>
-        <property name="margin-top">15</property>
-        <property name="margin-bottom">15</property>
+        <property name="margin-start">140</property>
+        <property name="margin-end">140</property>
+        <property name="margin-top">50</property>
+        <property name="margin-bottom">50</property>
         <property name="hexpand">True</property>
         <property name="vexpand">True</property>
         <child>
           <object class="GtkButton" id="pin_7">
             <property name="label" translatable="yes">7</property>
+            <property name="width-request">-1</property>
             <property name="visible">True</property>
             <property name="can-focus">True</property>
             <property name="receives-default">True</property>

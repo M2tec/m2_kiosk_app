@@ -2,8 +2,8 @@
 Type=Application
 Encoding=UTF-8
 Name=M2 Kiosk App 
-Comment=Blockchain payment provider app for Odoo
-Icon=/path/to/icon.xpm
-Exec=/path/to/application/executable
+Comment=Cardano payment app
+Icon=/usr/local/share/m2-kiosk-app/m2-kiosk-app.xpm
+Exec=m2-kiosk-app
 Terminal=false
 Categories=Tags;Describing;Application

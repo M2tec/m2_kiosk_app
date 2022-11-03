@@ -16,7 +16,7 @@ gi.require_version("Gtk", "3.0")
 gi.require_version('Soup', '2.4')
 from gi.repository import Gio, GLib, Gdk, Gtk, GdkPixbuf, Soup
 
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Root
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__))) # This is your Project Root
 
 # Handle command line arguments
 parser = argparse.ArgumentParser(description='M2 Kiosk App for processing blockchain payments.')
@@ -65,16 +65,14 @@ def on_pinpad_grid_button_press_event(widget,event, builder):
     #print(pin_entry)
     
     if pin_entry == secret_code:
-        print('You got it')
         Gtk.main_quit()
         
     pin_entry_obj.set_label(pin_entry)  
   
 def pin_enable(builder_env):
+    main_box = builder_env.get_object("main_box")
     pinpad_grid = builder_env.get_object("pinpad_grid")
     window1 = builder_env.get_object("window1")
-    
-    main_box = builder_env.get_object("main_box")
     
     window1.remove(main_box)
     window1.add(pinpad_grid)
@@ -84,7 +82,6 @@ def pin_disable(builder_env):
     main_box = builder_env.get_object("main_box")
     pinpad_grid = builder_env.get_object("pinpad_grid")
     window1 = builder_env.get_object("window1")
-    
     
     window1.remove(pinpad_grid)
     window1.add(main_box)
@@ -157,7 +154,7 @@ if __name__ == "__main__":
     window2 = builder.get_object("window2")
     window2.remove(pinpad_grid)
 
-    fullscreen_at_monitor(window1, 0)
+    #fullscreen_at_monitor(window1, 0)
 
     Gtk.main()
 
