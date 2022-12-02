@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import os
 import argparse
+import platform
 
 import json
 import requests
@@ -30,6 +31,26 @@ f.close()
 import request_handlers as rh
 
 secret_code = "1199"
+
+import socket
+
+# Get host ip address 
+
+  
+
+def get_Host_name_IP():
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        host_ip = s.getsockname()[0]
+        print(host_ip)
+        s.close()
+        
+    except:
+        print("Unable to get Hostname and IP")
+
+    return host_ip
+
 
 def fullscreen_at_monitor(window, n):
 
@@ -190,6 +211,10 @@ if __name__ == "__main__":
     server.admin_pad_9 = builder.get_object("pin_9")
     server.admin_pad_back = builder.get_object("pin_back")
     server.pin_entry_obj = builder.get_object("pin_label")
+    server.ip_address_info = builder.get_object("ip_address_info")
+
+    host_ip = get_Host_name_IP()
+    server.ip_address_info.set_text("https://" + host_ip)  
 
     server.admin_pad_0.connect("button-release-event", on_admin_pad_button_press_event, server)    
     server.admin_pad_1.connect("button-release-event", on_admin_pad_button_press_event, server)
@@ -202,6 +227,7 @@ if __name__ == "__main__":
     server.admin_pad_8.connect("button-release-event", on_admin_pad_button_press_event, server)
     server.admin_pad_9.connect("button-release-event", on_admin_pad_button_press_event, server)
     server.admin_pad_back.connect("button-release-event", on_admin_pad_button_press_event, server)
+    
 
     # Connect tip panel to server object
     server.tip_main_box = builder.get_object("tip_main_box")    
