@@ -279,7 +279,7 @@ if __name__ == "__main__":
     #server.payment_box.hide()
         
     if platform.machine() == 'aarch64':
-        fullscreen_at_monitor(window1, 0)
+        fullscreen_at_monitor(server.window1, 0)
 
     server.window1.connect('destroy', Gtk.main_quit)
 
