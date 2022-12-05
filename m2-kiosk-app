@@ -43,7 +43,7 @@ def get_Host_name_IP():
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(("8.8.8.8", 80))
         host_ip = s.getsockname()[0]
-        print(host_ip)
+        #print(host_ip)
         s.close()
         
     except:
@@ -60,7 +60,7 @@ def fullscreen_at_monitor(window, n):
     x = geometry.x
     y = geometry.y
 
-    print(str(x) + ' x ' + str(y))
+    #print(str(x) + ' x ' + str(y))
     window.move(x,y)
     window.fullscreen()
     window.Decorated = False
@@ -94,13 +94,13 @@ def on_tip_pad_button_press_event(widget,event, server):
         return
     
     tip_digit = widget.get_label()
-    print(tip_digit)
+    #print(tip_digit)
     
     server.tip_digits += tip_digit
-    print(server.tip_digits)
+    #print(server.tip_digits)
         
     tip_amount = int(server.tip_digits) / 100
-    print(tip_amount)
+    #print(tip_amount)
       
     server.tip_amount_label.set_text("{:.2f}".format(tip_amount))  
     
@@ -116,7 +116,7 @@ def on_tip_ok_button_press_event(widget,event, server):
     server.window1.add(server.start_main_box)
     server.window1.show_all() 
  
-    print('ok')   
+    #print('ok')   
     f = open(ROOT_DIR + '/m2_config.json')
     config_data = json.load(f)
     f.close()
