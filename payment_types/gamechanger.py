@@ -2,6 +2,7 @@ import json
 import subprocess
 import requests
 from pprint import pprint
+import os
 
 from Naked.toolshed.shell import execute_js, muterun_js
 import qrcode
@@ -57,16 +58,19 @@ def qr_code(tx_file_name, transaction_id, wallet_address, amount):
     #print(command_string)
     #result = subprocess.run(command_list, stdout=subprocess.PIPE)
     
-    
-    
+
+    ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Root
+    json_root = ROOT_DIR + '/../json-url-reduced/json-url-reduced.js'
+
     # Generate qr code 
-    print(tx_file_name + '.json')
-    response = muterun_js('json-url-reduced/json-url-reduced.js', tx_file_name + '.json')
-    #response = execute_js('json-url-reduced/json-url-reduced.js', tx_file_name + '.json')
-    #print(response)
+    print('json file: \t' + tx_file_name + '.json')
+
+    response = muterun_js(json_root, tx_file_name + '.json')
     url = response.stdout.decode("utf-8").replace("\n", "")
 
-    print(url)
+    #response = execute_js(json_root, tx_file_name + '.json')
+
+    #print(url)
 
     img = qrcode.make(url)
     type(img)  # qrcode.image.pil.PilImage
