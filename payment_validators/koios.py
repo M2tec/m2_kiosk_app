@@ -140,15 +140,12 @@ def confirm_amount(network_type, wallet_address, checked_hash, requested_amount)
 def payment_validate(network_type, transaction_id, wallet_address, requested_amount):
                  
     block_tip = get_block_tip(network_type)
-
     
     json_tx_filter = {"_addresses":[wallet_address],
                       "_after_block_height": block_tip - 5000 }  
     transaction_hash_list = get_transactions_hashlist(network_type, json_tx_filter)
 
-   
     transactions_metadata = get_tx_metadata(network_type, transaction_hash_list)
-
     
     checked_hash = check_metadata_type_and_title(transactions_metadata, transaction_id)
 

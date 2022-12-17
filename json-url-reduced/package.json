@@ -1,0 +1,16 @@
+{
+  "name": "Simplified version of json-url",
+  "version": "1.0.0",
+  "description": "WRAPS WRAPS WRAPERDED WRAP WRAP ARGGGGG!!!",
+  "main": "json-url-reduced.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "GPLv3",
+  "dependencies": {
+    "msgpack5": "^4.2.1",
+    "node-lzw": "^0.3.1",
+	"urlsafe-base64": "^1.0.0"
+  }
+}
