@@ -2,6 +2,7 @@
 import os
 import argparse
 import platform
+import socket
 
 import json
 import requests
@@ -32,10 +33,8 @@ import request_handlers as rh
 
 secret_code = "1199"
 
-import socket
 
-# Get host ip address 
-def get_Host_name_IP():
+def get_host_ip():
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(("8.8.8.8", 80))
@@ -44,9 +43,18 @@ def get_Host_name_IP():
         s.close()
         
     except:
-        print("Unable to get Hostname and IP")
+        print("Unable to get an ip address")
 
     return host_ip
+
+def get_domain_name(ip_address):
+    try:
+        result=socket.gethostbyaddr(ip_address)
+        dns_name = list(result)[0] 
+    except:
+        print("Unable to get an ip address
+    
+    return dns_name
 
 
 def fullscreen_at_monitor(window, n):
@@ -61,6 +69,7 @@ def fullscreen_at_monitor(window, n):
     window.move(x,y)
     window.fullscreen()
     window.Decorated = False
+
 
 def on_admin_pad_button_press_event(widget,event, server):
     #print(widget.get_label())
@@ -85,6 +94,7 @@ def on_admin_pad_button_press_event(widget,event, server):
         
     server.pin_entry_obj.set_label(pin_entry)  
 
+
 def on_tip_pad_button_press_event(widget,event, server):
     
     if len(server.tip_digits) >= 4:
@@ -100,12 +110,13 @@ def on_tip_pad_button_press_event(widget,event, server):
     #print(tip_amount)
       
     server.tip_amount_label.set_text("{:.2f}".format(tip_amount))  
+
     
 def on_tip_clear_button_press_event(widget,event, server):
     server.tip_digits = '' 
     server.tip_amount_label.set_text("{:.2f}".format(0))  
 
-def on_tip_ok_button_press_event(widget,event, server):
+
 
     tip_amount = int(server.tip_digits) / 100
     
@@ -130,6 +141,7 @@ def on_tip_ok_button_press_event(widget,event, server):
     
     server.tip_digits = '' 
     server.tip_amount_label.set_text("{:.2f}".format(0))  
+
 
 def tip_panel_enable(widget, event, server):
     server.window1.remove(server.start_main_box)
@@ -210,8 +222,9 @@ if __name__ == "__main__":
     server.pin_entry_obj = builder.get_object("pin_label")
     server.ip_address_info = builder.get_object("ip_address_info")
 
-    host_ip = get_Host_name_IP()
-    server.ip_address_info.set_text("https://" + host_ip)  
+    host_ip = get_host_ip()
+    dns_name = get_domain_name(host_ip)
+    server.ip_address_info.set_text("https://" + host_ip + ' or https://' + dns_name )  
 
     server.admin_pad_0.connect("button-release-event", on_admin_pad_button_press_event, server)    
     server.admin_pad_1.connect("button-release-event", on_admin_pad_button_press_event, server)
