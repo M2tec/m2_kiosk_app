@@ -36,6 +36,9 @@ function create_package() {
     # Create debian package
     #dpkg-deb --build --root-owner-group ${TARGET}
     echo "Building package"
+    # Clear out .pyc
+    py3clean ${PACKAGE_BUILDDEB}
+    
     DEB="${SCRIPT_DIR}/../${M2_DEBS}/${PACKAGE}_${NEW_VERSION}-1.deb"
     dpkg-deb --build -Zgzip ${PACKAGE_BUILDDEB} $DEB 
     

@@ -19,6 +19,8 @@ install_subdir('payment_types', install_dir: get_option('datadir'))
 install_subdir('payment_validators', install_dir: get_option('datadir'))
 install_subdir('static', install_dir: get_option('datadir'))
 
-install_data('m2-kiosk-app.desktop', install_dir: 'etc/xdg/autostart')
+#install_data('m2-kiosk-app.desktop', install_dir: 'etc/xdg/autostart')
+install_data('m2-kiosk-app.desktop', install_dir: '/usr/share/applications')
+
 
 install_subdir('DEBIAN', install_dir: '')

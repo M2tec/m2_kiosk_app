@@ -1,3 +1,3 @@
 
-ln -s /usr/local/share/m2-kiosk-app/m2-kiosk-app /usr/local/bin/m2-kiosk-app
+ln -s /usr/share/m2-kiosk-app/m2-kiosk-app /usr/bin/m2-kiosk-app
 
