@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-from gi.repository import Gio, GLib, Gdk, Gtk, GdkPixbuf, Soup
+
 import request_handlers as rh
 import os
 import argparse
@@ -18,6 +18,8 @@ import gi
 gi.require_version('Gdk', '3.0')
 gi.require_version("Gtk", "3.0")
 gi.require_version('Soup', '2.4')
+from gi.repository import Gio, GLib, Gdk, Gtk, GdkPixbuf, Soup
+
 # This is your Project Root
 ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
 
