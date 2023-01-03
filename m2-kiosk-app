@@ -118,6 +118,18 @@ def on_tip_pad_button_press_event(widget, event, server):
     server.tip_amount_label.set_text("{:.2f}".format(tip_amount))
 
 
+def on_tip_pad_ok_press_event(widget, event, server):
+    print("Tip amount = " + server.tip_digits)
+    tip_amount = int(server.tip_digits) / 100
+
+    json_data = {
+        "transaction_id": 'blabla',
+        "wallet_address": 'testnet_address',
+        "amount": tip_amount}
+
+    rh.payment_request_simple(server, json_data)
+
+
 def on_tip_clear_button_press_event(widget, event, server):
     server.tip_digits = ''
     server.tip_amount_label.set_text("{:.2f}".format(0))
@@ -167,6 +179,7 @@ def admin_panel_enable(widget, event, server):
     server.ip_address_info.set_text("https://" + dns_name + "  or  https://" + host_ip)
 
     server.window1.remove(server.start_main_box)
+    server.window1.remove(server.payment_main_box)
     server.window1.add(server.admin_main_box)
     server.window1.show_all()
 
@@ -212,8 +225,9 @@ if __name__ == "__main__":
     server.payment_label = builder.get_object("amount_label")
 
     server.payment_image_event = builder.get_object("payment_image_event")
-
     set_payment_image(server.payment_image)
+    server.payment_image_event.connect(
+        "button-release-event", admin_panel_enable, server)
 
     # Connect admin panel to server object
     server.admin_main_box = builder.get_object("admin_main_box")
@@ -276,7 +290,7 @@ if __name__ == "__main__":
 
     server.tip_pad_ok.connect(
         "button-release-event",
-        on_tip_pad_button_press_event,
+        on_tip_pad_ok_press_event,
         server)
 
     server.tip_digits = ''

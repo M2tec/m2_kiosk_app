@@ -60,6 +60,7 @@ def payment_request_simple(server, json_dict):
     print("payment_request_simple")
 
     server.window1.remove(server.start_main_box)
+    server.window1.remove(server.tip_main_box)
     server.window1.add(server.payment_main_box)
     server.window1.show_all()
 
