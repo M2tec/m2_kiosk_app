@@ -161,6 +161,11 @@ def tip_panel_disable(widget, event, server):
 
 
 def admin_panel_enable(widget, event, server):
+
+    host_ip = get_host_ip()
+    dns_name = get_domain_name(host_ip)
+    server.ip_address_info.set_text("https://" + dns_name + "  or  https://" + host_ip)
+
     server.window1.remove(server.start_main_box)
     server.window1.add(server.admin_main_box)
     server.window1.show_all()
@@ -228,10 +233,6 @@ if __name__ == "__main__":
     server.admin_pad_back = builder.get_object("pin_back")
     server.pin_entry_obj = builder.get_object("pin_label")
     server.ip_address_info = builder.get_object("ip_address_info")
-
-    host_ip = get_host_ip()
-    dns_name = get_domain_name(host_ip)
-    server.ip_address_info.set_text("https://" + dns_name + "  or  https://" + host_ip)
 
     server.admin_pad_0.connect("button-release-event", on_admin_pad_button_press_event, server)
     server.admin_pad_1.connect("button-release-event", on_admin_pad_button_press_event, server)

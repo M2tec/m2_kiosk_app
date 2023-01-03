@@ -1,4 +1,4 @@
-from gi.repository import GdkPixbuf
+
 import os
 import secrets
 import string
@@ -7,6 +7,7 @@ import subprocess
 
 import gi
 gi.require_version('GdkPixbuf', '2.0')
+from gi.repository import GdkPixbuf  # NOQA
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))  # This is your Project Root
 
