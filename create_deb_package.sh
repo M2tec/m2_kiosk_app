@@ -25,7 +25,7 @@ function create_package() {
     # Update package version
     sed -i s/Version.*/"Version: ${NEW_VERSION}"/ DEBIAN/control
 
-    # Set the prefix to the root filesystem for the package build
+    # Set the prefix. This will install into the debian package as the root folder
     cd ${SCRIPT_DIR}/builddir && meson configure --prefix ${PACKAGE_BUILDDEB}
     cd ${SCRIPT_DIR}/builddir && meson configure --datadir usr/share
 
@@ -66,7 +66,7 @@ if git diff-index --quiet HEAD --; then
     echo 'No changes'
     git status
 else
-    git commit -a --verbose
     create_package
+    git commit -a --verbose
 fi
 
