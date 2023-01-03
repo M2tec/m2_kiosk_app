@@ -63,9 +63,7 @@ if git diff-index --quiet HEAD --; then
     echo 'No changes'
     git status
 else
-    git status
-    git diff
-    git commit -a
+    git commit -a --verbose
     # Changes
 fi
 
