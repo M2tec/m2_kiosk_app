@@ -64,8 +64,8 @@ if git diff-index --quiet HEAD --; then
     git status
 else
     git status
-    git diff 
-    git commit -a 
+    git diff
+    git commit -a
     # Changes
 fi
 
