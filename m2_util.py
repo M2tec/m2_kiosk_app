@@ -1,3 +1,4 @@
+from gi.repository import GdkPixbuf
 import os
 import secrets
 import string
@@ -6,9 +7,9 @@ import subprocess
 
 import gi
 gi.require_version('GdkPixbuf', '2.0')
-from gi.repository import GdkPixbuf
 
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Root
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))  # This is your Project Root
+
 
 def set_payment_image(image1, image_file=ROOT_DIR + '/static/m2tec_logo_github.png'):
     pixbuf = GdkPixbuf.Pixbuf.new_from_file(image_file)
@@ -37,6 +38,3 @@ def check_odoo_and_cardano(odoo_port, wallet_port):
     else:
         print("Make sure the Cardano wallet backend is running on port: " + str(wallet_port))
         quit()
-
-
-

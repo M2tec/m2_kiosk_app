@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+import request_handlers as rh
+from gi.repository import Gio, GLib, Gdk, Gtk, GdkPixbuf, Soup
 import os
 import argparse
 import platform
@@ -16,20 +18,25 @@ import gi
 gi.require_version('Gdk', '3.0')
 gi.require_version("Gtk", "3.0")
 gi.require_version('Soup', '2.4')
-from gi.repository import Gio, GLib, Gdk, Gtk, GdkPixbuf, Soup
 
-ROOT_DIR = os.path.dirname(os.path.realpath(__file__)) # This is your Project Roo
+# This is your Project Root
+ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
+
 # Handle command line arguments
-parser = argparse.ArgumentParser(description='M2 Kiosk App for processing blockchain payments.')
+parser = argparse.ArgumentParser(
+    description='M2 Kiosk App for processing blockchain payments.')
 parser.add_argument('-t', '--test-mode', help='Start in test mode')
-parser.add_argument('-p', '--odoo-port', help='Specify Odoo port number', default='8069')
+parser.add_argument(
+    '-p',
+    '--odoo-port',
+    help='Specify Odoo port number',
+    default='8069')
 args = parser.parse_args()
 
 f = open(ROOT_DIR + '/m2_config.json')
 config_data = json.load(f)
 f.close()
 
-import request_handlers as rh
 
 secret_code = "1199"
 
@@ -39,21 +46,22 @@ def get_host_ip():
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(("8.8.8.8", 80))
         host_ip = s.getsockname()[0]
-        #print(host_ip)
+        # print(host_ip)
         s.close()
-        
-    except:
+
+    except BaseException:
         print("Unable to get an ip address")
 
     return host_ip
 
+
 def get_domain_name(ip_address):
     try:
-        result=socket.gethostbyaddr(ip_address)
-        dns_name = list(result)[0] 
-    except:
+        result = socket.gethostbyaddr(ip_address)
+        dns_name = list(result)[0]
+    except BaseException:
         print("Unable to get an ip address")
-    
+
     return dns_name
 
 
@@ -65,82 +73,80 @@ def fullscreen_at_monitor(window, n):
     x = geometry.x
     y = geometry.y
 
-    #print(str(x) + ' x ' + str(y))
-    window.move(x,y)
+    # print(str(x) + ' x ' + str(y))
+    window.move(x, y)
     window.fullscreen()
     window.Decorated = False
 
 
-def on_admin_pad_button_press_event(widget,event, server):
-    #print(widget.get_label())
-    
+def on_admin_pad_button_press_event(widget, event, server):
+    # print(widget.get_label())
+
     pin_entry = server.pin_entry_obj.get_label()
- 
+
     if len(pin_entry) >= 4:
-        pin_entry = '' 
-        
+        pin_entry = ''
+
     button_label = widget.get_label()
-    
+
     if button_label == "gtk-go-back":
-        #print("back")
+        # print("back")
         admin_panel_disable(server)
         return
-            
-    pin_entry += button_label    
-    #print(pin_entry)
-    
+
+    pin_entry += button_label
+    # print(pin_entry)
+
     if pin_entry == secret_code:
         Gtk.main_quit()
-        
-    server.pin_entry_obj.set_label(pin_entry)  
+
+    server.pin_entry_obj.set_label(pin_entry)
 
 
-def on_tip_pad_button_press_event(widget,event, server):
-    
+def on_tip_pad_button_press_event(widget, event, server):
+
     if len(server.tip_digits) >= 4:
         return
-    
+
     tip_digit = widget.get_label()
-    #print(tip_digit)
-    
+    # print(tip_digit)
+
     server.tip_digits += tip_digit
-    #print(server.tip_digits)
-        
-    tip_amount = int(server.tip_digits) / 100
-    #print(tip_amount)
-      
-    server.tip_amount_label.set_text("{:.2f}".format(tip_amount))  
-
-    
-def on_tip_clear_button_press_event(widget,event, server):
-    server.tip_digits = '' 
-    server.tip_amount_label.set_text("{:.2f}".format(0))  
-
-
+    # print(server.tip_digits)
 
     tip_amount = int(server.tip_digits) / 100
-    
+    # print(tip_amount)
+
+    server.tip_amount_label.set_text("{:.2f}".format(tip_amount))
+
+
+def on_tip_clear_button_press_event(widget, event, server):
+    server.tip_digits = ''
+    server.tip_amount_label.set_text("{:.2f}".format(0))
+
+    tip_amount = int(server.tip_digits) / 100
+
     server.window1.remove(server.tip_main_box)
     server.window1.add(server.start_main_box)
-    server.window1.show_all() 
- 
-    #print('ok')   
+    server.window1.show_all()
+
+    # print('ok')
     f = open(ROOT_DIR + '/m2_config.json')
     config_data = json.load(f)
     f.close()
 
     json_dict = {}
-    
+
     json_dict["transaction_id"] = '0000'
     json_dict["amount"] = tip_amount
     json_dict["wallet_address"] = config_data["cardano"]["wallet_testnet_address"]
-    
+
     pprint(json_dict)
-    
+
     rh.payment_request_simple(server, json_dict)
-    
-    server.tip_digits = '' 
-    server.tip_amount_label.set_text("{:.2f}".format(0))  
+
+    server.tip_digits = ''
+    server.tip_amount_label.set_text("{:.2f}".format(0))
 
 
 def tip_panel_enable(widget, event, server):
@@ -148,23 +154,26 @@ def tip_panel_enable(widget, event, server):
     server.window1.add(server.tip_main_box)
     server.window1.show_all()
     return
-    
+
+
 def tip_panel_disable(widget, event, server):
     server.window1.remove(server.tip_main_box)
     server.window1.add(server.start_main_box)
-    server.window1.show_all() 
+    server.window1.show_all()
 
-  
+
 def admin_panel_enable(widget, event, server):
     server.window1.remove(server.start_main_box)
     server.window1.add(server.admin_main_box)
     server.window1.show_all()
-    
+
+
 def admin_panel_disable(server):
     server.window1.remove(server.admin_main_box)
     server.window1.add(server.start_main_box)
     server.window1.show_all()
-    
+
+
 if __name__ == "__main__":
 
     # Create a server to listen to requests
@@ -172,7 +181,7 @@ if __name__ == "__main__":
     server.listen_all(9090, Soup.ServerListenOptions(0))
     data = ''
     server.add_handler("/payment-request", rh.payment_request, data)
-    server.add_handler("/payment-status", rh.payment_status, data)    
+    server.add_handler("/payment-status", rh.payment_status, data)
     server.add_handler("/clear-display", rh.clear_display_request, data)
 
     # Setup gtk builder
@@ -183,32 +192,32 @@ if __name__ == "__main__":
     # Connect start panel to server object
     server.start_main_box = builder.get_object("start_main_box")
     server.tip_button = builder.get_object("tip_button")
-    server.tip_button.connect("button-release-event", tip_panel_enable, server)  
+    server.tip_button.connect("button-release-event", tip_panel_enable, server)
     server.vendor_image = builder.get_object("vendor_image")
     set_payment_image(server.vendor_image)
 
     server.vendor_image_event = builder.get_object("vendor_image_event")
-    server.vendor_image_event.connect("button-release-event", admin_panel_enable, server)
-    
+    server.vendor_image_event.connect(
+        "button-release-event", admin_panel_enable, server)
+
     # Connect payment panel to server object
     server.payment_main_box = builder.get_object("payment_main_box")
     window3 = builder.get_object("window3")
-    window3.remove(server.payment_main_box)  
+    window3.remove(server.payment_main_box)
 
     server.payment_image = builder.get_object("payment_image")
     server.payment_label = builder.get_object("amount_label")
-    
+
     server.payment_image_event = builder.get_object("payment_image_event")
- 
+
     set_payment_image(server.payment_image)
-  
-   
+
     # Connect admin panel to server object
     server.admin_main_box = builder.get_object("admin_main_box")
     window2 = builder.get_object("window2")
     window2.remove(server.admin_main_box)
 
-    server.admin_pad_0 = builder.get_object("pin_0")    
+    server.admin_pad_0 = builder.get_object("pin_0")
     server.admin_pad_1 = builder.get_object("pin_1")
     server.admin_pad_2 = builder.get_object("pin_2")
     server.admin_pad_3 = builder.get_object("pin_3")
@@ -224,9 +233,9 @@ if __name__ == "__main__":
 
     host_ip = get_host_ip()
     dns_name = get_domain_name(host_ip)
-    server.ip_address_info.set_text("https://" + host_ip + " or https://" + dns_name)  
+    server.ip_address_info.set_text("https://" + dns_name "  or  https://" + host_ip)
 
-    server.admin_pad_0.connect("button-release-event", on_admin_pad_button_press_event, server)    
+    server.admin_pad_0.connect("button-release-event", on_admin_pad_button_press_event, server)
     server.admin_pad_1.connect("button-release-event", on_admin_pad_button_press_event, server)
     server.admin_pad_2.connect("button-release-event", on_admin_pad_button_press_event, server)
     server.admin_pad_3.connect("button-release-event", on_admin_pad_button_press_event, server)
@@ -237,14 +246,13 @@ if __name__ == "__main__":
     server.admin_pad_8.connect("button-release-event", on_admin_pad_button_press_event, server)
     server.admin_pad_9.connect("button-release-event", on_admin_pad_button_press_event, server)
     server.admin_pad_back.connect("button-release-event", on_admin_pad_button_press_event, server)
-    
 
     # Connect tip panel to server object
-    server.tip_main_box = builder.get_object("tip_main_box")    
+    server.tip_main_box = builder.get_object("tip_main_box")
     window4 = builder.get_object("window4")
     window4.remove(server.tip_main_box)
 
-    server.tip_pad_0 = builder.get_object("tippin_0")    
+    server.tip_pad_0 = builder.get_object("tippin_0")
     server.tip_pad_1 = builder.get_object("tippin_1")
     server.tip_pad_2 = builder.get_object("tippin_2")
     server.tip_pad_3 = builder.get_object("tippin_3")
@@ -256,7 +264,7 @@ if __name__ == "__main__":
     server.tip_pad_9 = builder.get_object("tippin_9")
     server.tip_pad_ok = builder.get_object("tippin_ok")
 
-    server.tip_pad_0.connect("button-release-event", on_tip_pad_button_press_event, server)    
+    server.tip_pad_0.connect("button-release-event", on_tip_pad_button_press_event, server)
     server.tip_pad_1.connect("button-release-event", on_tip_pad_button_press_event, server)
     server.tip_pad_2.connect("button-release-event", on_tip_pad_button_press_event, server)
     server.tip_pad_3.connect("button-release-event", on_tip_pad_button_press_event, server)
@@ -266,17 +274,24 @@ if __name__ == "__main__":
     server.tip_pad_7.connect("button-release-event", on_tip_pad_button_press_event, server)
     server.tip_pad_8.connect("button-release-event", on_tip_pad_button_press_event, server)
     server.tip_pad_9.connect("button-release-event", on_tip_pad_button_press_event, server)
-    
-    server.tip_pad_ok.connect("button-release-event", on_tip_pad_button_press_event, server)
-    
+
+    server.tip_pad_ok.connect(
+        "button-release-event",
+        on_tip_pad_button_press_event,
+        server)
+
     server.tip_digits = ''
     server.tip_amount_label = builder.get_object("tip_amount_label")
 
     server.tip_goback_button = builder.get_object("tip_goback_button")
-    server.tip_goback_button.connect("button-release-event", tip_panel_disable, server)  
+    server.tip_goback_button.connect(
+        "button-release-event", tip_panel_disable, server)
 
     server.tip_clear_button = builder.get_object("tip_clear_button")
-    server.tip_clear_button.connect("button-release-event", on_tip_clear_button_press_event, server)  
+    server.tip_clear_button.connect(
+        "button-release-event",
+        on_tip_clear_button_press_event,
+        server)
 
     # Setup main window
     headerbar = Gtk.HeaderBar()
@@ -286,9 +301,9 @@ if __name__ == "__main__":
     server.window1 = builder.get_object("window1")
     server.window1.set_titlebar(headerbar)
     server.window1.show_all()
-    #server.payment_box.hide()
-        
-    #if platform.machine() == 'aarch64':
+    # server.payment_box.hide()
+
+    # if platform.machine() == 'aarch64':
     if platform.machine() != 'x86_64':
         fullscreen_at_monitor(server.window1, 0)
 
@@ -297,4 +312,3 @@ if __name__ == "__main__":
     Gtk.main()
 
     print("Exiting...")
-
