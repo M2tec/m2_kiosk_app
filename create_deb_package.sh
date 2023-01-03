@@ -39,14 +39,14 @@ function create_package() {
     # Clear out .pyc
     py3clean ${PACKAGE_BUILDDEB}
     
-    DEB="${SCRIPT_DIR}/../${M2_DEBS}/${PACKAGE}_${NEW_VERSION}-1.deb"
+    DEB="${SCRIPT_DIR}/../${M2_DEBS}/${PACKAGE}_${NEW_VERSION}_all.deb"
     dpkg-deb --build -Zgzip ${PACKAGE_BUILDDEB} $DEB 
     
     echo "Copying to latest"
     LATEST="${SCRIPT_DIR}/../${M2_DEBS}/latest/"
     
     cd ${LATEST}
-    rm -rf ${PACKAGE}_*-1.deb
+    rm -rf ${PACKAGE}_*.deb
     cd ${SCRIPT_DIR}
     
     cp ${DEB} ${LATEST}
