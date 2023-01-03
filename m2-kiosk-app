@@ -233,7 +233,7 @@ if __name__ == "__main__":
 
     host_ip = get_host_ip()
     dns_name = get_domain_name(host_ip)
-    server.ip_address_info.set_text("https://" + dns_name "  or  https://" + host_ip)
+    server.ip_address_info.set_text("https://" + dns_name + "  or  https://" + host_ip)
 
     server.admin_pad_0.connect("button-release-event", on_admin_pad_button_press_event, server)
     server.admin_pad_1.connect("button-release-event", on_admin_pad_button_press_event, server)
