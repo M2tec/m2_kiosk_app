@@ -32,6 +32,8 @@ def check_cors_origin(message):
     return cors_local_url
 
 # Handle payment request for the gamechanger wallet
+
+
 def payment_request(server, message, path, query, client_context, data):
     print('-------- payment request ----------')
 
@@ -78,6 +80,8 @@ def payment_request_simple(server, json_dict):
     server.window1.show_all()
 
 # Handle payment status for the gamechanger wallet
+
+
 def payment_status(server, message, path, query, client_context, data):
     print('-------- payment status ----------')
 

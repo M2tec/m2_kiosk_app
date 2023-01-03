@@ -7,3 +7,6 @@ package-lock.json
 /.idea
 __pycache__/
 *.py[cod]
+.kiosk-session.swp
+/old
+/Documentation
