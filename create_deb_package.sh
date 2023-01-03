@@ -1,12 +1,12 @@
 #!/bin/bash
-set -x
+# set -x
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 echo ${SCRIPT_DIR}
 
 function create_package() {
 
-    echo "=========Creating package ${PACKAGE} ============="
+    echo "============ Creating package ${PACKAGE} ============="
 
     cd ${SCRIPT_DIR}
 
@@ -17,10 +17,11 @@ function create_package() {
 
     # Increment package version
     VERSION_MINOR=$(echo ${VERSION_NUMBER} | cut -d "." -f 2)
-    echo ${VERSION_MINOR}
+    #echo ${VERSION_MINOR}
     VERSION_INCREMENT=$((${VERSION_MINOR} + 1))
     NEW_VERSION="0.${VERSION_INCREMENT}"
-
+    echo "The new version is ${NEW_VERSION}"
+    
     # Update package version
     sed -i s/Version.*/"Version: ${NEW_VERSION}"/ DEBIAN/control
 
@@ -34,9 +35,11 @@ function create_package() {
 
     # Create debian package
     #dpkg-deb --build --root-owner-group ${TARGET}
+    echo "Building package"
     DEB="${SCRIPT_DIR}/../${M2_DEBS}/${PACKAGE}_${NEW_VERSION}-1.deb"
     dpkg-deb --build -Zgzip ${PACKAGE_BUILDDEB} $DEB 
     
+    echo "Copying to latest"
     LATEST="${SCRIPT_DIR}/../${M2_DEBS}/latest/"
     
     cd ${LATEST}
@@ -64,9 +67,6 @@ if git diff-index --quiet HEAD --; then
     git status
 else
     git commit -a --verbose
-    # Changes
+    create_package
 fi
 
-
-
-#create_package
