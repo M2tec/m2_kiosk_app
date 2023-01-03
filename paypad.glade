@@ -47,7 +47,7 @@
               <object class="GtkImage" id="vendor_image">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="pixbuf">m2tec_logo.jpg</property>
+                <property name="pixbuf">static/m2tec_logo.jpg</property>
               </object>
             </child>
           </object>

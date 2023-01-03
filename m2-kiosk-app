@@ -1,6 +1,6 @@
 #!/usr/bin/python3
-import request_handlers as rh
 from gi.repository import Gio, GLib, Gdk, Gtk, GdkPixbuf, Soup
+import request_handlers as rh
 import os
 import argparse
 import platform
