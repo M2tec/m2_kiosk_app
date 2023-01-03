@@ -51,10 +51,10 @@ function create_package() {
 
 
 ### M2 kiosk app
-echo 
-echo 'M2 kiosk app'
-echo
 PACKAGE="m2-kiosk-app"
+echo 
+echo ${PACKAGE}
+echo
 PACKAGE_BUILDDEB="${SCRIPT_DIR}/../${PACKAGE}_builddeb"
 M2_DEBS="m2-debs"
 
