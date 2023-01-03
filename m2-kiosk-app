@@ -1,24 +1,21 @@
 #!/usr/bin/python3
-
-import request_handlers as rh
-import os
-import argparse
-import platform
-import socket
-
-import json
-import requests
-from pprint import pprint
-
-from m2_util import *
-from payment_types import *
 from payment_validators import *
+from payment_types import *
+from m2_util import *
+from pprint import pprint
+import requests
+import json
+import socket
+import platform
+import argparse
+import os
+import request_handlers as rh
 
 import gi
 gi.require_version('Gdk', '3.0')
 gi.require_version("Gtk", "3.0")
 gi.require_version('Soup', '2.4')
-from gi.repository import Gio, GLib, Gdk, Gtk, GdkPixbuf, Soup
+from gi.repository import Gio, GLib, Gdk, Gtk, GdkPixbuf, Soup  # NOQA
 
 # This is your Project Root
 ROOT_DIR = os.path.dirname(os.path.realpath(__file__))

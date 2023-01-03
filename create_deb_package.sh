@@ -27,8 +27,6 @@ function create_package() {
 
     # Set the prefix. This will install into the debian package as the root folder
     cd ${SCRIPT_DIR}/builddir && meson configure --prefix ${PACKAGE_BUILDDEB}
-    cd ${SCRIPT_DIR}/builddir && meson configure --datadir usr/share
-
     cd ${SCRIPT_DIR}/builddir && meson install
     
     cd ${SCRIPT_DIR}
@@ -61,8 +59,8 @@ echo
 PACKAGE_BUILDDEB="${SCRIPT_DIR}/../${PACKAGE}_builddeb"
 M2_DEBS="m2-debs"
 
-autopep8 --in-place --aggressive --max-line-length 100 m2-kiosk-app
-autopep8 --recursive --in-place --aggressive --max-line-length 100 *.py
+autopep8 --in-place --max-line-length 100 m2-kiosk-app
+autopep8 --recursive --in-place --max-line-length 100 *.py
 
 if git diff-index --quiet HEAD --; then
     # No changes

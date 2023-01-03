@@ -1,4 +1,4 @@
-from gi.repository import Gio, GLib, Gdk, Gtk, GdkPixbuf
+
 import json
 from pprint import pprint
 
@@ -10,6 +10,7 @@ import gi
 gi.require_version('Gdk', '3.0')
 gi.require_version("Gtk", "3.0")
 gi.require_version('Soup', '2.4')
+from gi.repository import Gio, GLib, Gdk, Gtk, GdkPixbuf  # NOQA
 
 
 def check_cors_origin(message):
