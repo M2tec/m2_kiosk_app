@@ -19,6 +19,9 @@ function tx_encode(tx_json) {
 }
 
 function create_url(network, gcscript) {
+
+    //console.log(network)
+    //console.log(gcscript)
     var gcscript = tx_encode(gcscript);
 
     let url;
@@ -32,18 +35,23 @@ function create_url(network, gcscript) {
 }
 
 var network = 'testnet'
-//var gcscript = {"type":"tx","title":"Demo","description":"created with gamechanger-dapp-cli","metadata":{"123":{"message":"Hello World!"}}}
+
 
 var json_file_name = process.argv[2]
+//var json_file_name = "/tmp/shop_data-00051-003-0003.json"
 
 var gcscript = ''
 
 try {
-  gcscript = fs.readFileSync(json_file_name, 'utf8');
-  //console.log(gcscript);
+  gcscript = JSON.parse(fs.readFileSync(json_file_name, 'utf8'));
 } catch (err) {
   console.error(err);
 }
-//var gcscript = rocess.argv[2]
+//var gcscript = process.argv[2]
+
+//var gcscript = {"type":"tx","title":"Demo","description":"created with gamechanger-dapp-cli","metadata":{"123":{"message":"Hello World!"}}}
+//console.log(typeof gcscript)
 
 create_url(network, gcscript);
+
+

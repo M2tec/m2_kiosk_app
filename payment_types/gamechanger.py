@@ -60,17 +60,17 @@ def qr_code(tx_file_name, transaction_id, wallet_address, amount):
     
 
     ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Root
-    json_root = ROOT_DIR + '/../json-url-reduced/json-url-reduced.js'
+    json_url_path = ROOT_DIR + '/../json-url-reduced/json-url-reduced.js'
 
     # Generate qr code 
     print('json file: \t' + tx_file_name + '.json')
 
-    response = muterun_js(json_root, tx_file_name + '.json')
+    response = muterun_js(json_url_path, tx_file_name + '.json')
     url = response.stdout.decode("utf-8").replace("\n", "")
 
     #response = execute_js(json_root, tx_file_name + '.json')
 
-    #print(url)
+    print(url)
 
     img = qrcode.make(url)
     type(img)  # qrcode.image.pil.PilImage
