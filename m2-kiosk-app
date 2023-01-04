@@ -39,10 +39,7 @@ except FileNotFoundError:
         f.write("{}")
         f.close()
     except OSError as error:
- 
-                 print(error)
-
-quit()
+        print(error)
 
 # Handle command line arguments
 parser = argparse.ArgumentParser(
