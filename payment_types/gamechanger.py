@@ -42,6 +42,8 @@ def qr_code(network_type, transaction_id, wallet_address, amount):
     
     tx_json = cardano_transaction_json(transaction_id, wallet_address, amount)
     
+    tx_file_name = '/tmp/shop_data-' + transaction_id
+    
     with open(tx_file_name + '.json', 'w') as outfile:
         json.dump(tx_json, outfile)
     
@@ -66,8 +68,10 @@ def qr_code(network_type, transaction_id, wallet_address, amount):
 
     # Generate qr code 
     print('json file: \t' + tx_file_name + '.json')
+    tx_file_name_json = tx_file_name + '.json'
+    arg_in = f"{network_type} {tx_file_name_json}"
 
-    response = muterun_js(json_url_path, network_type, tx_file_name + '.json')
+    response = muterun_js(json_url_path, arg_in)
     url = response.stdout.decode("utf-8").replace("\n", "")
 
     #response = execute_js(json_root, tx_file_name + '.json')

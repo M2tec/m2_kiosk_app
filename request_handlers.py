@@ -41,7 +41,7 @@ def payment_request(server, message, path, query, client_context, data):
     try:
         json_dict = json.loads(message.request_body.data)
         # print()
-        # pprint(repr(json_dict))
+        pprint(repr(json_dict))
         # print()
     except json.decoder.JSONDecodeError:
         print('json.decoder.JSONDecodeError')
@@ -64,6 +64,7 @@ def payment_request_simple(server, json_dict):
     server.window1.add(server.payment_main_box)
     server.window1.show_all()
 
+    network_type = json_dict["network_type"]
     transaction_id = str(json_dict["transaction_id"])
     requested_amount = float(json_dict["amount"])
     wallet_address = json_dict["wallet_address"]
@@ -71,7 +72,7 @@ def payment_request_simple(server, json_dict):
     # print(transaction_id)
 
     tx_file_name = gamechanger.qr_code(
-        network, transaction_id, wallet_address, int(
+        network_type, transaction_id, wallet_address, int(
             requested_amount * 1000000))
 
     # Set QR code image

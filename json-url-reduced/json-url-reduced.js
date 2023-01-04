@@ -18,25 +18,25 @@ function tx_encode(tx_json) {
     return tx_safe64_encoded
 }
 
-function create_url(network, gcscript) {
+function create_url(network_type, gcscript) {
 
-    //console.log(network)
+    //console.log(network_type)
     //console.log(gcscript)
     var gcscript = tx_encode(gcscript);
 
     let url;
-    if (network === 'mainnet')
+    if (network_type === 'mainnet')
 	    url = 'https://wallet.gamechanger.finance/api/1/tx/' + gcscript;
-    else if (network === 'testnet')
+    else if (network_type === 'testnet')
 	    url = 'https://testnet-wallet.gamechanger.finance/api/1/tx/' + gcscript;
     
     //console.log('\n')
     console.log(url)
 }
 
-//var network = 'testnet'
+//var network_type = 'testnet'
 
-var network = process.argv[2]
+var network_type = process.argv[2]
 var json_file_name = process.argv[3]
 //var json_file_name = "/tmp/shop_data-00051-003-0003.json"
 
@@ -52,6 +52,6 @@ try {
 //var gcscript = {"type":"tx","title":"Demo","description":"created with gamechanger-dapp-cli","metadata":{"123":{"message":"Hello World!"}}}
 //console.log(typeof gcscript)
 
-create_url(network, gcscript);
+create_url(network_type, gcscript);
 
 

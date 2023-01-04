@@ -10,6 +10,8 @@ import platform
 import argparse
 import os
 import request_handlers as rh
+import random
+from datetime import datetime
 
 import gi
 gi.require_version('Gdk', '3.0')
@@ -20,26 +22,24 @@ from gi.repository import Gio, GLib, Gdk, Gtk, GdkPixbuf, Soup  # NOQA
 # This is your Project Root
 ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
 HOME_DIR = os.path.expanduser('~')
-print(HOME_DIR)
 
-try:
-    config_folder = HOME_DIR + "/.config/m2-kiosk-app/"
-    config_file = "config.json"
-    f = open(config_file)
-    config_data = json.load(f)
-    f.close()
-except FileNotFoundError:
-    print("Config file not found: " + config_folder + config_file)
-    print("Creating new config file")
 
+def get_config_data():
     try:
-        os.mkdir(config_folder)
+        if platform.machine() == 'x86_64':
+            config_folder = HOME_DIR + "/.config/m2-kiosk-app/"
+        else:
+            config_folder = "/var/www/m2-kiosk-app/.config/"
 
-        f = open(config_file, "w")
-        f.write("{}")
+        print(config_folder)
+        config_file = "config.json"
+        f = open(config_folder + config_file)
+        config_data = json.load(f)
         f.close()
-    except OSError as error:
-        print(error)
+    except FileNotFoundError:
+        print("Config file not found: " + config_folder + config_file)
+    return config_data
+
 
 # Handle command line arguments
 parser = argparse.ArgumentParser(
@@ -138,41 +138,35 @@ def on_tip_pad_ok_press_event(widget, event, server):
     print("Tip amount = " + server.tip_digits)
     tip_amount = int(server.tip_digits) / 100
 
+    config_data = get_config_data()
+
+    network_type = config_data["cardano"]["network_type"]
+
+    if network_type == 'testnet':
+        wallet_address = config_data["cardano"]["testnet_wallet_address"]
+    elif network_type == 'mainnet':
+        wallet_address = config_data["cardano"]["mainnet_wallet_address"]
+
+    randomID = random.randint(0, 9999)
+
+    now = datetime.now()
+    d1 = now.strftime("%y%m%d-%H%M")
+
+    transaction_id = d1 + "-" + str(randomID)
+    print(transaction_id)
+
     json_data = {
-        "transaction_id": 'blabla',
-        "wallet_address": 'testnet_address',
+        "network_type": network_type,
+        "transaction_id": transaction_id,
+        "wallet_address": wallet_address,
         "amount": tip_amount}
+
+    pprint(json_data)
 
     rh.payment_request_simple(server, json_data)
 
 
 def on_tip_clear_button_press_event(widget, event, server):
-    server.tip_digits = ''
-    server.tip_amount_label.set_text("{:.2f}".format(0))
-
-    tip_amount = int(server.tip_digits) / 100
-
-    server.window1.remove(server.tip_main_box)
-    server.window1.add(server.start_main_box)
-    server.window1.show_all()
-
-    network_type = config_data["cardano"]["network_type"]
-
-    if network_type == 'testnet':
-        wallet_address = config_data["cardano"]["wallet_testnet_address"]
-    elif network_type == 'mainnet':
-        wallet_address = config_data["cardano"]["wallet_mainnet_address"]
-
-    json_dict = {}
-    json_dict["network_type"] = network_type
-    json_dict["transaction_id"] = '0000'
-    json_dict["amount"] = tip_amount
-    json_dict["wallet_address"] = wallet_address
-
-    pprint(json_dict)
-
-    rh.payment_request_simple(server, json_dict)
-
     server.tip_digits = ''
     server.tip_amount_label.set_text("{:.2f}".format(0))
 
