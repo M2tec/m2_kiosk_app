@@ -37,7 +37,7 @@ def cardano_transaction_json(transaction_id, wallet_address, amount):
     return transaction_dict
 
 
-def qr_code(tx_file_name, transaction_id, wallet_address, amount):
+def qr_code(network_type, transaction_id, wallet_address, amount):
     print('-------- qr_code ----------')
     
     tx_json = cardano_transaction_json(transaction_id, wallet_address, amount)
@@ -49,15 +49,17 @@ def qr_code(tx_file_name, transaction_id, wallet_address, amount):
     #print(tx_json)
     #print(type(tx_json))
     
-    cardano_net = 'testnet'
+    #network_type = 'testnet'
     
     # npm gamechanger-dapp-cli - this is very slow
     #gc_cli = 'gamechanger-dapp-cli'
-    #command_list = [gc_cli, cardano_net, 'build', '--template', 'printable', 'qr', '-a', tx_json, '-o', tx_file_name + '.png']
+    #command_list = [gc_cli, network_type, 'build', '--template', 'printable', 'qr', '-a', tx_json, '-o', tx_file_name + '.png']
     #command_string = ' '.join(command_list)
     #print(command_string)
     #result = subprocess.run(command_list, stdout=subprocess.PIPE)
-    
+
+    tx_file_name = '/tmp/shop_data-' + transaction_id
+    print(tx_file_name)
 
     ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Root
     json_url_path = ROOT_DIR + '/../json-url-reduced/json-url-reduced.js'
@@ -65,7 +67,7 @@ def qr_code(tx_file_name, transaction_id, wallet_address, amount):
     # Generate qr code 
     print('json file: \t' + tx_file_name + '.json')
 
-    response = muterun_js(json_url_path, tx_file_name + '.json')
+    response = muterun_js(json_url_path, network_type, tx_file_name + '.json')
     url = response.stdout.decode("utf-8").replace("\n", "")
 
     #response = execute_js(json_root, tx_file_name + '.json')
@@ -76,6 +78,7 @@ def qr_code(tx_file_name, transaction_id, wallet_address, amount):
     type(img)  # qrcode.image.pil.PilImage
     img.save(tx_file_name + '.png')
 
+    return tx_file_name + '.png'
 
 
 

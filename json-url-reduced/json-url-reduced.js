@@ -34,10 +34,10 @@ function create_url(network, gcscript) {
     console.log(url)
 }
 
-var network = 'testnet'
+//var network = 'testnet'
 
-
-var json_file_name = process.argv[2]
+var network = process.argv[2]
+var json_file_name = process.argv[3]
 //var json_file_name = "/tmp/shop_data-00051-003-0003.json"
 
 var gcscript = ''

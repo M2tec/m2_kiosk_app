@@ -19,6 +19,30 @@ from gi.repository import Gio, GLib, Gdk, Gtk, GdkPixbuf, Soup  # NOQA
 
 # This is your Project Root
 ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
+HOME_DIR = os.path.expanduser('~')
+print(HOME_DIR)
+
+try:
+    config_folder = HOME_DIR + "/.config/m2-kiosk-app/"
+    config_file = "config.json"
+    f = open(config_file)
+    config_data = json.load(f)
+    f.close()
+except FileNotFoundError:
+    print("Config file not found: " + config_folder + config_file)
+    print("Creating new config file")
+
+    try:
+        os.mkdir(config_folder)
+
+        f = open(config_file, "w")
+        f.write("{}")
+        f.close()
+    except OSError as error:
+         
+         print(error)
+
+    quit()
 
 # Handle command line arguments
 parser = argparse.ArgumentParser(
@@ -30,11 +54,6 @@ parser.add_argument(
     help='Specify Odoo port number',
     default='8069')
 args = parser.parse_args()
-
-f = open(ROOT_DIR + '/m2_config.json')
-config_data = json.load(f)
-f.close()
-
 
 secret_code = "1199"
 
@@ -140,16 +159,18 @@ def on_tip_clear_button_press_event(widget, event, server):
     server.window1.add(server.start_main_box)
     server.window1.show_all()
 
-    # print('ok')
-    f = open(ROOT_DIR + '/m2_config.json')
-    config_data = json.load(f)
-    f.close()
+    network_type = config_data["cardano"]["network_type"]
+
+    if network_type == 'testnet':
+        wallet_address = config_data["cardano"]["wallet_testnet_address"]
+    elif network_type == 'mainnet':
+        wallet_address = config_data["cardano"]["wallet_mainnet_address"]
 
     json_dict = {}
-
+    json_dict["network_type"] = network_type
     json_dict["transaction_id"] = '0000'
     json_dict["amount"] = tip_amount
-    json_dict["wallet_address"] = config_data["cardano"]["wallet_testnet_address"]
+    json_dict["wallet_address"] = wallet_address
 
     pprint(json_dict)
 

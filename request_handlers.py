@@ -68,16 +68,14 @@ def payment_request_simple(server, json_dict):
     requested_amount = float(json_dict["amount"])
     wallet_address = json_dict["wallet_address"]
 
-    print(transaction_id)
-    # Create a Gamechanger QR-code
-    tx_file_name = '/tmp/shop_data-' + transaction_id
-    print(tx_file_name)
-    gamechanger.qr_code(
-        tx_file_name, transaction_id, wallet_address, int(
+    # print(transaction_id)
+
+    tx_file_name = gamechanger.qr_code(
+        network, transaction_id, wallet_address, int(
             requested_amount * 1000000))
 
     # Set QR code image
-    set_payment_image(server.payment_image, tx_file_name + '.png')
+    set_payment_image(server.payment_image, tx_file_name)
     server.payment_label.set_text("{:.2f}".format(requested_amount))
     server.window1.show_all()
 
