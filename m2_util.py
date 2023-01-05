@@ -3,13 +3,33 @@ import os
 import secrets
 import string
 import subprocess
-
+import locale
+import platform
+import json
 
 import gi
 gi.require_version('GdkPixbuf', '2.0')
 from gi.repository import GdkPixbuf  # NOQA
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))  # This is your Project Root
+HOME_DIR = os.path.expanduser('~')
+
+
+def get_config_data():
+    try:
+        if platform.machine() == 'x86_64':
+            config_folder = HOME_DIR + "/.config/m2-kiosk-app/"
+        else:
+            config_folder = "/var/www/m2-kiosk-web/.config/"
+
+        # print(config_folder)
+        config_file = "config.json"
+        f = open(config_folder + config_file)
+        config_data = json.load(f)
+        f.close()
+    except FileNotFoundError:
+        print("Config file not found: " + config_folder + config_file)
+    return config_data
 
 
 def set_payment_image(image1, image_file=ROOT_DIR + '/static/m2tec_logo_github.png'):

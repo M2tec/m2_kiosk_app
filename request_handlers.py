@@ -77,7 +77,14 @@ def payment_request_simple(server, json_dict):
 
     # Set QR code image
     set_payment_image(server.payment_image, tx_file_name)
-    server.payment_label.set_text("{:.2f}".format(requested_amount))
+
+    config_data = get_config_data()
+    locale_setting = config_data["globals"]["locale_setting"]
+    locale.setlocale(locale.LC_ALL, locale_setting)
+
+    requested_amount = locale.format_string('%.2f', requested_amount, grouping=True)
+
+    server.payment_label.set_text(requested_amount)
     server.window1.show_all()
 
 # Handle payment status for the gamechanger wallet

@@ -424,7 +424,7 @@ to scan the qr-code</property>
                     <property name="halign">end</property>
                     <property name="valign">end</property>
                     <property name="hexpand">True</property>
-                    <property name="label" translatable="yes">100,00</property>
+                    <property name="label" translatable="yes">100.00</property>
                     <attributes>
                       <attribute name="font-desc" value="Sans Bold 27"/>
                     </attributes>
@@ -516,9 +516,7 @@ to scan the qr-code</property>
                 <property name="label" translatable="yes">You can provide a tip of your
 choosing. Enter the amount
 on the right and press OK. 
-You can then scan the QR-code
-with the Gamechanger app to
-send your tip amount</property>
+Minimum amount is 1 ADA.</property>
                 <attributes>
                   <attribute name="font-desc" value="Sans 14"/>
                 </attributes>
@@ -598,7 +596,7 @@ send your tip amount</property>
                     <property name="halign">end</property>
                     <property name="valign">end</property>
                     <property name="hexpand">True</property>
-                    <property name="label" translatable="yes">0,00</property>
+                    <property name="label" translatable="yes">0.00</property>
                     <attributes>
                       <attribute name="font-desc" value="Sans Bold 27"/>
                     </attributes>
