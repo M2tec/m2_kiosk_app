@@ -47,6 +47,8 @@ def get_host_ip():
 
     except BaseException:
         print("Unable to get an ip address")
+        host_ip = ""
+        pass
 
     return host_ip
 
@@ -184,9 +186,13 @@ def tip_panel_disable(widget, event, server):
 
 def admin_panel_enable(widget, event, server):
 
-    host_ip = get_host_ip()
-    dns_name = get_domain_name(host_ip)
-    server.ip_address_info.set_text("https://" + dns_name + "  or  https://" + host_ip)
+    try:
+        host_ip = get_host_ip()
+        dns_name = get_domain_name(host_ip)
+        server.ip_address_info.set_text("https://" + dns_name + "  or  https://" + host_ip)
+    except Exception as e:
+        print(e)
+        pass
 
     server.window1.remove(server.start_main_box)
     server.window1.remove(server.payment_main_box)
