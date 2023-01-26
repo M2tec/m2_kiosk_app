@@ -149,8 +149,11 @@ def payment_status(server, message, path, query, client_context, data):
 def clear_display_request(server, message, path, query, client_context, data):
 
     # Update UI
-    set_payment_image(server.payment_image)
-    server.payment_box.hide()
+    # set_payment_image(server.payment_image)
+    # server.payment_box.hide()
+    server.window1.remove(server.payment_main_box)
+    server.window1.add(server.start_main_box)
+    server.window1.show_all()
 
     # HTTP Response
     cors_local_url = check_cors_origin(message)
