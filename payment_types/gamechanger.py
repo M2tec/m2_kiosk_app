@@ -27,14 +27,22 @@ from Naked.toolshed.shell import execute_js, muterun_js
 import qrcode
 
 
-def cardano_transaction_json(transaction_id, wallet_address, amount):
+def cardano_transaction_json(json_dict):
+
+    network_type = json_dict["network_type"]
+    transaction_id = str(json_dict["transaction_id"])
+    requested_amount = float(json_dict["amount"]) * 1000000
+    token_name = json_dict["token_name"]
+    token_policyID = json_dict["policyID"]
+    wallet_address = json_dict["wallet_address"]
+
     metadata_dict = {
         '123': {'message': transaction_id}
     }
     amounts_dict_1 = {
         'quantity': str(int(amount)),
-        'policyId': 'ada',
-        'assetName': 'ada'
+        'policyId': token_name,
+        'assetName': token_name
     }
 
     amounts_list = [amounts_dict_1]
@@ -56,29 +64,19 @@ def cardano_transaction_json(transaction_id, wallet_address, amount):
     return transaction_dict
 
 
-def qr_code(network_type, transaction_id, wallet_address, amount):
+def qr_code(json_dict):
     print('-------- qr_code ----------')
+      
+    network_type = json_dict["network_type"]
+    transaction_id = str(json_dict["transaction_id"])
     
-    tx_json = cardano_transaction_json(transaction_id, wallet_address, amount)
+    tx_json = cardano_transaction_json(json_dict)
     
     tx_file_name = '/tmp/shop_data-' + transaction_id
     
     with open(tx_file_name + '.json', 'w') as outfile:
         json.dump(tx_json, outfile)
     
-    #print()
-    #print(tx_json)
-    #print(type(tx_json))
-    
-    #network_type = 'testnet'
-    
-    # npm gamechanger-dapp-cli - this is very slow
-    #gc_cli = 'gamechanger-dapp-cli'
-    #command_list = [gc_cli, network_type, 'build', '--template', 'printable', 'qr', '-a', tx_json, '-o', tx_file_name + '.png']
-    #command_string = ' '.join(command_list)
-    #print(command_string)
-    #result = subprocess.run(command_list, stdout=subprocess.PIPE)
-
     tx_file_name = '/tmp/shop_data-' + transaction_id
     print(tx_file_name)
 

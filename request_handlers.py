@@ -82,16 +82,14 @@ def payment_request_simple(server, json_dict):
     server.window1.add(server.payment_main_box)
     server.window1.show_all()
 
-    network_type = json_dict["network_type"]
-    transaction_id = str(json_dict["transaction_id"])
+    #network_type = json_dict["network_type"]
+    #transaction_id = str(json_dict["transaction_id"])
     requested_amount = float(json_dict["amount"])
-    wallet_address = json_dict["wallet_address"]
+    #wallet_address = json_dict["wallet_address"]
 
     # print(transaction_id)
 
-    tx_file_name = gamechanger.qr_code(
-        network_type, transaction_id, wallet_address, int(
-            requested_amount * 1000000))
+    tx_file_name = gamechanger.qr_code(json_dict)
 
     # Set QR code image
     set_payment_image(server.payment_image, tx_file_name)
@@ -149,12 +147,13 @@ def payment_status(server, message, path, query, client_context, data):
 def clear_display_request(server, message, path, query, client_context, data):
 
     # Update UI
-    # set_payment_image(server.payment_image)
-    # server.payment_box.hide()
+    #set_payment_image(server.payment_image)
+    #server.payment_box.hide()
     server.window1.remove(server.payment_main_box)
     server.window1.add(server.start_main_box)
     server.window1.show_all()
-
+    
+    
     # HTTP Response
     cors_local_url = check_cors_origin(message)
     message.response_headers.append("Access-Control-Allow-Origin", cors_local_url)
