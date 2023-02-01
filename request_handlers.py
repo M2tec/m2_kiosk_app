@@ -30,6 +30,19 @@ gi.require_version("Gtk", "3.0")
 gi.require_version('Soup', '2.4')
 from gi.repository import Gio, GLib, Gdk, Gtk, GdkPixbuf  # NOQA
 
+def pretty_print_json(ugly_json):  
+    parsed_json = json.loads(ugly_json)
+    pretty_json = json.dumps(parsed_json, indent=4)
+    print(pretty_json)
+
+def remove_child_widget(server):
+    child_widgets = server.window1.get_children()
+    for w in child_widgets:
+        widget_type = type(w).__name__
+        if widget_type == 'Box':
+            child_widget = w
+               
+    server.window1.remove(child_widget)
 
 def check_cors_origin(message):
     # Set the cors header
@@ -55,12 +68,11 @@ def check_cors_origin(message):
 
 def payment_request(server, message, path, query, client_context, data):
     print('-------- payment request ----------')
-
+    pretty_print_json(message.request_body.data)
+    print()
+    
     try:
         json_dict = json.loads(message.request_body.data)
-        # print()
-        pprint(repr(json_dict))
-        # print()
     except json.decoder.JSONDecodeError:
         print('json.decoder.JSONDecodeError')
         return
@@ -77,8 +89,7 @@ def payment_request(server, message, path, query, client_context, data):
 def payment_request_simple(server, json_dict):
     print("payment_request_simple")
 
-    server.window1.remove(server.start_main_box)
-    server.window1.remove(server.tip_main_box)
+    remove_child_widget(server)
     server.window1.add(server.payment_main_box)
     server.window1.show_all()
 
@@ -146,7 +157,7 @@ def clear_display_request(server, message, path, query, client_context, data):
     # Update UI
     #set_payment_image(server.payment_image)
     #server.payment_box.hide()
-    server.window1.remove(server.payment_main_box)
+    remove_child_widget(server)
     server.window1.add(server.start_main_box)
     server.window1.show_all()
     

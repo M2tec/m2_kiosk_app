@@ -10,6 +10,7 @@
     <property name="hide-titlebar-when-maximized">True</property>
     <child>
       <object class="GtkBox" id="start_main_box">
+        <property name="name">start_main_box</property>
         <property name="can-focus">False</property>
         <property name="margin-start">15</property>
         <property name="margin-end">15</property>
@@ -68,6 +69,7 @@
     <property name="can-focus">False</property>
     <child>
       <object class="GtkBox" id="admin_main_box">
+        <property name="name">admin_main_box</property>
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="margin-start">15</property>
@@ -308,6 +310,7 @@
     <property name="hide-titlebar-when-maximized">True</property>
     <child>
       <object class="GtkBox" id="payment_main_box">
+        <property name="name">payment_main_box</property>
         <property name="can-focus">False</property>
         <property name="margin-start">15</property>
         <property name="margin-end">15</property>
@@ -356,7 +359,7 @@ to scan the qr-code</property>
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="token_name">
+              <object class="GtkLabel">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="double-buffered">False</property>
@@ -369,7 +372,7 @@ to scan the qr-code</property>
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="token">
+              <object class="GtkLabel" id="token_name">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="halign">start</property>
@@ -478,6 +481,7 @@ to scan the qr-code</property>
     <property name="can-focus">False</property>
     <child>
       <object class="GtkBox" id="tip_main_box">
+        <property name="name">tip_main_box</property>
         <property name="can-focus">False</property>
         <property name="margin-start">15</property>
         <property name="margin-end">15</property>

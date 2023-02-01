@@ -166,9 +166,12 @@ def on_tip_pad_ok_press_event(widget, event, server):
         "network_type": network_type,
         "transaction_id": transaction_id,
         "wallet_address": wallet_address,
+        "token_policyID": "ada",
+        "token_name": "ADA",
         "amount": tip_amount}
 
     pprint(json_data)
+    print()
 
     rh.payment_request_simple(server, json_data)
 
@@ -186,18 +189,17 @@ def on_tip_clear_button_press_event(widget, event, server):
 
 
 def tip_panel_enable(widget, event, server):
-    server.window1.remove(server.start_main_box)
+    rh.remove_child_widget(server)
     server.window1.add(server.tip_main_box)
     server.window1.show_all()
 
     tip_amount = 0
     tip_amount = locale.format_string('%.2f', tip_amount)
     server.tip_amount_label.set_text(tip_amount)
-    return
 
 
 def tip_panel_disable(widget, event, server):
-    server.window1.remove(server.tip_main_box)
+    rh.remove_child_widget(server)
     server.window1.add(server.start_main_box)
     server.window1.show_all()
 
@@ -213,14 +215,13 @@ def admin_panel_enable(widget, event, server):
         dns_name = ""
         pass
 
-    server.window1.remove(server.start_main_box)
-    server.window1.remove(server.payment_main_box)
+    rh.remove_child_widget(server)
     server.window1.add(server.admin_main_box)
     server.window1.show_all()
 
 
 def admin_panel_disable(server):
-    server.window1.remove(server.admin_main_box)
+    rh.remove_child_widget(server)
     server.window1.add(server.start_main_box)
     server.window1.show_all()
 
@@ -351,7 +352,8 @@ if __name__ == "__main__":
     server.window1 = builder.get_object("window1")
     server.window1.set_titlebar(headerbar)
     server.window1.show_all()
-    # server.payment_box.hide()
+    # server.payment_box.hide()   
+    
 
     # if platform.machine() == 'aarch64':
     if platform.machine() != 'x86_64':
