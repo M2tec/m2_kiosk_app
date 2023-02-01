@@ -21,6 +21,7 @@ from payment_validators import *
 from payment_types import *
 from m2_util import *
 from pprint import pprint
+import signal
 import requests
 import json
 import socket
@@ -360,7 +361,8 @@ if __name__ == "__main__":
         fullscreen_at_monitor(server.window1, 0)
 
     server.window1.connect('destroy', Gtk.main_quit)
-
+    GLib.unix_signal_add(GLib.PRIORITY_DEFAULT, signal.SIGINT, Gtk.main_quit)
+ 
     Gtk.main()
 
     print("Exiting...")
