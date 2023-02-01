@@ -257,6 +257,8 @@ if __name__ == "__main__":
     window3.remove(server.payment_main_box)
 
     server.payment_image = builder.get_object("payment_image")
+    server.token_name = builder.get_object("token_name")
+    server.token_image = builder.get_object("token_image")
     server.payment_label = builder.get_object("amount_label")
 
     server.payment_image_event = builder.get_object("payment_image_event")

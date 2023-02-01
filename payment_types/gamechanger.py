@@ -30,18 +30,18 @@ import qrcode
 def cardano_transaction_json(json_dict):
 
     network_type = json_dict["network_type"]
-    transaction_id = str(json_dict["transaction_id"])
-    requested_amount = float(json_dict["amount"]) * 1000000
-    token_name = json_dict["token_name"]
-    token_policyID = json_dict["policyID"]
     wallet_address = json_dict["wallet_address"]
+    transaction_id = str(json_dict["transaction_id"])
+    token_policyID = json_dict["token_policyID"]
+    token_name = json_dict["token_name"]
+    requested_amount = float(json_dict["amount"]) * 1000000
 
     metadata_dict = {
         '123': {'message': transaction_id}
     }
     amounts_dict_1 = {
-        'quantity': str(int(amount)),
-        'policyId': token_name,
+        'quantity': str(int(requested_amount)),
+        'policyId': token_policyID,
         'assetName': token_name
     }
 

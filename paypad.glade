@@ -356,7 +356,7 @@ to scan the qr-code</property>
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="label3">
+              <object class="GtkLabel" id="token_name">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="double-buffered">False</property>
@@ -369,12 +369,12 @@ to scan the qr-code</property>
               </packing>
             </child>
             <child>
-              <object class="GtkLabel">
+              <object class="GtkLabel" id="token">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="halign">start</property>
                 <property name="hexpand">True</property>
-                <property name="label" translatable="yes">Amount</property>
+                <property name="label" translatable="yes">ADA</property>
                 <attributes>
                   <attribute name="font-desc" value="Sans Bold 23"/>
                 </attributes>
@@ -404,12 +404,11 @@ to scan the qr-code</property>
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <child>
-                  <object class="GtkImage">
+                  <object class="GtkImage" id="token_image">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="valign">baseline</property>
                     <property name="vexpand">False</property>
-                    <property name="pixbuf">static/ada_coin.png</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -432,6 +431,7 @@ to scan the qr-code</property>
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">True</property>
+                    <property name="pack-type">end</property>
                     <property name="position">1</property>
                   </packing>
                 </child>

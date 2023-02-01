@@ -82,13 +82,9 @@ def payment_request_simple(server, json_dict):
     server.window1.add(server.payment_main_box)
     server.window1.show_all()
 
-    #network_type = json_dict["network_type"]
-    #transaction_id = str(json_dict["transaction_id"])
     requested_amount = float(json_dict["amount"])
-    #wallet_address = json_dict["wallet_address"]
-
-    # print(transaction_id)
-
+    token_name = json_dict["token_name"]
+    
     tx_file_name = gamechanger.qr_code(json_dict)
 
     # Set QR code image
@@ -99,7 +95,8 @@ def payment_request_simple(server, json_dict):
     locale.setlocale(locale.LC_ALL, locale_setting)
 
     requested_amount = locale.format_string('%.2f', requested_amount, grouping=True)
-
+    server.token_name.set_text(token_name)
+    
     server.payment_label.set_text(requested_amount)
     server.window1.show_all()
 
