@@ -379,7 +379,7 @@ to scan the qr-code</property>
                 <property name="hexpand">True</property>
                 <property name="label" translatable="yes">ADA</property>
                 <attributes>
-                  <attribute name="font-desc" value="Sans Bold 23"/>
+                  <attribute name="font-desc" value="Sans Bold 20"/>
                 </attributes>
               </object>
               <packing>
@@ -389,12 +389,10 @@ to scan the qr-code</property>
               </packing>
             </child>
             <child>
-              <object class="GtkSeparator">
-                <property name="width-request">6</property>
+              <object class="GtkImage">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-top">5</property>
-                <property name="margin-bottom">5</property>
+                <property name="pixbuf">static/line.svg</property>
               </object>
               <packing>
                 <property name="expand">False</property>
