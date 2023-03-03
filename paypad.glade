@@ -18,11 +18,13 @@
         <property name="margin-bottom">15</property>
         <property name="hexpand">False</property>
         <child>
-          <object class="GtkButton" id="tip_button">
+          <object class="GtkButton" id="tip_enable">
+            <property name="name">tip_enable</property>
             <property name="visible">True</property>
             <property name="can-focus">True</property>
             <property name="receives-default">True</property>
             <property name="margin-end">15</property>
+            <signal name="released" handler="change_panel" swapped="no"/>
             <child>
               <object class="GtkLabel">
                 <property name="visible">True</property>
@@ -42,8 +44,10 @@
         </child>
         <child>
           <object class="GtkEventBox" id="vendor_image_event">
+            <property name="name">admin_enable</property>
             <property name="visible">True</property>
             <property name="can-focus">False</property>
+            <signal name="button-release-event" handler="change_panel" swapped="no"/>
             <child>
               <object class="GtkImage" id="vendor_image">
                 <property name="visible">True</property>
@@ -99,6 +103,7 @@
                 <property name="receives-default">True</property>
                 <property name="hexpand">True</property>
                 <property name="vexpand">True</property>
+                <signal name="released" handler="on_admin_pad_button_release_event" swapped="no"/>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -113,6 +118,7 @@
                 <property name="receives-default">True</property>
                 <property name="hexpand">True</property>
                 <property name="vexpand">True</property>
+                <signal name="released" handler="on_admin_pad_button_release_event" swapped="no"/>
               </object>
               <packing>
                 <property name="left-attach">1</property>
@@ -127,6 +133,7 @@
                 <property name="receives-default">True</property>
                 <property name="hexpand">True</property>
                 <property name="vexpand">True</property>
+                <signal name="released" handler="on_admin_pad_button_release_event" swapped="no"/>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -141,6 +148,7 @@
                 <property name="receives-default">True</property>
                 <property name="hexpand">True</property>
                 <property name="vexpand">True</property>
+                <signal name="released" handler="on_admin_pad_button_release_event" swapped="no"/>
               </object>
               <packing>
                 <property name="left-attach">1</property>
@@ -155,6 +163,7 @@
                 <property name="receives-default">True</property>
                 <property name="hexpand">True</property>
                 <property name="vexpand">True</property>
+                <signal name="released" handler="on_admin_pad_button_release_event" swapped="no"/>
               </object>
               <packing>
                 <property name="left-attach">2</property>
@@ -169,6 +178,7 @@
                 <property name="receives-default">True</property>
                 <property name="hexpand">True</property>
                 <property name="vexpand">True</property>
+                <signal name="released" handler="on_admin_pad_button_release_event" swapped="no"/>
               </object>
               <packing>
                 <property name="left-attach">2</property>
@@ -183,6 +193,7 @@
                 <property name="receives-default">True</property>
                 <property name="hexpand">True</property>
                 <property name="vexpand">True</property>
+                <signal name="released" handler="on_admin_pad_button_release_event" swapped="no"/>
               </object>
               <packing>
                 <property name="left-attach">1</property>
@@ -197,6 +208,7 @@
                 <property name="receives-default">True</property>
                 <property name="hexpand">True</property>
                 <property name="vexpand">True</property>
+                <signal name="released" handler="on_admin_pad_button_release_event" swapped="no"/>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -211,6 +223,7 @@
                 <property name="receives-default">True</property>
                 <property name="hexpand">True</property>
                 <property name="vexpand">True</property>
+                <signal name="released" handler="on_admin_pad_button_release_event" swapped="no"/>
               </object>
               <packing>
                 <property name="left-attach">2</property>
@@ -235,6 +248,7 @@
                 <property name="receives-default">True</property>
                 <property name="hexpand">True</property>
                 <property name="vexpand">True</property>
+                <signal name="released" handler="on_admin_pad_button_release_event" swapped="no"/>
               </object>
               <packing>
                 <property name="left-attach">1</property>
@@ -244,6 +258,7 @@
             <child>
               <object class="GtkButton" id="pin_back">
                 <property name="label">gtk-go-back</property>
+                <property name="name">start_enable</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
@@ -251,6 +266,7 @@
                 <property name="vexpand">True</property>
                 <property name="use-stock">True</property>
                 <property name="always-show-image">True</property>
+                <signal name="released" handler="change_panel" swapped="no"/>
               </object>
               <packing>
                 <property name="left-attach">2</property>
@@ -641,6 +657,7 @@ Minimum amount is 1 ADA.</property>
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="receives-default">True</property>
+                    <signal name="released" handler="on_tip_clear_button_release_event" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -651,9 +668,11 @@ Minimum amount is 1 ADA.</property>
                 <child>
                   <object class="GtkButton" id="tip_goback_button">
                     <property name="label" translatable="yes">Go back</property>
+                    <property name="name">start_enable</property>
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="receives-default">True</property>
+                    <signal name="released" handler="change_panel" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -690,6 +709,7 @@ Minimum amount is 1 ADA.</property>
                     <property name="receives-default">True</property>
                     <property name="hexpand">True</property>
                     <property name="vexpand">True</property>
+                    <signal name="released" handler="on_tip_pad_button_release_event" swapped="no"/>
                   </object>
                   <packing>
                     <property name="left-attach">0</property>
@@ -704,6 +724,7 @@ Minimum amount is 1 ADA.</property>
                     <property name="receives-default">True</property>
                     <property name="hexpand">True</property>
                     <property name="vexpand">True</property>
+                    <signal name="released" handler="on_tip_pad_button_release_event" swapped="no"/>
                   </object>
                   <packing>
                     <property name="left-attach">1</property>
@@ -718,6 +739,7 @@ Minimum amount is 1 ADA.</property>
                     <property name="receives-default">True</property>
                     <property name="hexpand">True</property>
                     <property name="vexpand">True</property>
+                    <signal name="released" handler="on_tip_pad_button_release_event" swapped="no"/>
                   </object>
                   <packing>
                     <property name="left-attach">0</property>
@@ -732,6 +754,7 @@ Minimum amount is 1 ADA.</property>
                     <property name="receives-default">True</property>
                     <property name="hexpand">True</property>
                     <property name="vexpand">True</property>
+                    <signal name="released" handler="on_tip_pad_button_release_event" swapped="no"/>
                   </object>
                   <packing>
                     <property name="left-attach">1</property>
@@ -746,6 +769,7 @@ Minimum amount is 1 ADA.</property>
                     <property name="receives-default">True</property>
                     <property name="hexpand">True</property>
                     <property name="vexpand">True</property>
+                    <signal name="released" handler="on_tip_pad_button_release_event" swapped="no"/>
                   </object>
                   <packing>
                     <property name="left-attach">2</property>
@@ -760,6 +784,7 @@ Minimum amount is 1 ADA.</property>
                     <property name="receives-default">True</property>
                     <property name="hexpand">True</property>
                     <property name="vexpand">True</property>
+                    <signal name="released" handler="on_tip_pad_button_release_event" swapped="no"/>
                   </object>
                   <packing>
                     <property name="left-attach">2</property>
@@ -774,6 +799,7 @@ Minimum amount is 1 ADA.</property>
                     <property name="receives-default">True</property>
                     <property name="hexpand">True</property>
                     <property name="vexpand">True</property>
+                    <signal name="released" handler="on_tip_pad_button_release_event" swapped="no"/>
                   </object>
                   <packing>
                     <property name="left-attach">1</property>
@@ -788,6 +814,7 @@ Minimum amount is 1 ADA.</property>
                     <property name="receives-default">True</property>
                     <property name="hexpand">True</property>
                     <property name="vexpand">True</property>
+                    <signal name="released" handler="on_tip_pad_button_release_event" swapped="no"/>
                   </object>
                   <packing>
                     <property name="left-attach">0</property>
@@ -802,6 +829,7 @@ Minimum amount is 1 ADA.</property>
                     <property name="receives-default">True</property>
                     <property name="hexpand">True</property>
                     <property name="vexpand">True</property>
+                    <signal name="released" handler="on_tip_pad_button_release_event" swapped="no"/>
                   </object>
                   <packing>
                     <property name="left-attach">2</property>
@@ -816,6 +844,7 @@ Minimum amount is 1 ADA.</property>
                     <property name="receives-default">True</property>
                     <property name="hexpand">True</property>
                     <property name="vexpand">True</property>
+                    <signal name="released" handler="on_tip_pad_button_release_event" swapped="no"/>
                   </object>
                   <packing>
                     <property name="left-attach">1</property>
@@ -833,6 +862,7 @@ Minimum amount is 1 ADA.</property>
                     <property name="vexpand">True</property>
                     <property name="use-stock">True</property>
                     <property name="always-show-image">True</property>
+                    <signal name="released" handler="on_tip_pad_ok_release_event" swapped="no"/>
                   </object>
                   <packing>
                     <property name="left-attach">2</property>
