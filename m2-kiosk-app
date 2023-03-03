@@ -19,7 +19,8 @@
 
 from payment_validators import *
 from payment_types import *
-from m2_util import *
+
+import m2_util
 from pprint import pprint
 import signal
 import requests
@@ -31,7 +32,7 @@ import os
 import request_handlers as rh
 import random
 from datetime import datetime
-# import locale
+import locale
 
 import gi
 gi.require_version('Gdk', '3.0')
@@ -134,7 +135,7 @@ def on_tip_pad_button_press_event(widget, event, server):
     tip_amount = int(server.tip_digits) / 100
     # print(tip_amount)
 
-    config_data = get_config_data()
+    config_data = m2_util.get_config_data()
     locale_setting = config_data["globals"]["locale_setting"]
     locale.setlocale(locale.LC_ALL, locale_setting)
 
@@ -146,7 +147,7 @@ def on_tip_pad_ok_press_event(widget, event, server):
     print("Tip amount = " + server.tip_digits)
     tip_amount = int(server.tip_digits) / 100
 
-    config_data = get_config_data()
+    config_data = m2_util.get_config_data()
 
     network_type = config_data["cardano"]["network_type"]
 
@@ -180,7 +181,7 @@ def on_tip_pad_ok_press_event(widget, event, server):
 def on_tip_clear_button_press_event(widget, event, server):
     server.tip_digits = ''
 
-    config_data = get_config_data()
+    config_data = m2_util.get_config_data()
     locale_setting = config_data["globals"]["locale_setting"]
     locale.setlocale(locale.LC_ALL, locale_setting)
 
@@ -247,7 +248,7 @@ if __name__ == "__main__":
     server.tip_button = builder.get_object("tip_button")
     server.tip_button.connect("button-release-event", tip_panel_enable, server)
     server.vendor_image = builder.get_object("vendor_image")
-    set_payment_image(server.vendor_image)
+    m2_util.set_payment_image(server.vendor_image)
 
     server.vendor_image_event = builder.get_object("vendor_image_event")
     server.vendor_image_event.connect(
@@ -264,7 +265,7 @@ if __name__ == "__main__":
     server.payment_label = builder.get_object("amount_label")
 
     server.payment_image_event = builder.get_object("payment_image_event")
-    set_payment_image(server.payment_image)
+    m2_util.set_payment_image(server.payment_image)
     server.payment_image_event.connect(
         "button-release-event", admin_panel_enable, server)
 

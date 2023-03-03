@@ -36,7 +36,7 @@ HOME_DIR = os.path.expanduser('~')
 def get_config_data():
     try:
         if platform.machine() == 'x86_64':
-            config_folder = HOME_DIR + "/.config/m2-kiosk-app/"
+            config_folder = HOME_DIR + "/.config/m2-kiosk-web/"
         else:
             config_folder = "/var/www/m2-kiosk-web/.config/"
 
