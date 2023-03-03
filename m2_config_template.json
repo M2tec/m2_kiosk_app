@@ -1,0 +1,14 @@
+{
+    "globals": {
+        "vat_in_metadata": "True",
+        "locale_setting": "nl_NL.UTF-8"
+    },
+    "cardano": {
+        "network_type": "mainnet",
+        "mainnet_wallet_address": "",
+        "testnet_wallet_address": "",
+        "payment_type": "gamechanger",
+        "payment_validator": "koios"
+    }
+}
+
