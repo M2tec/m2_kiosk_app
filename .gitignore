@@ -1,5 +1,5 @@
 /src
-/env
+/venv
 mnemonic.txt
 /node_modules
 package-lock.json

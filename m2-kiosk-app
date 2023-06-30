@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 #
 # This file is part of the m2-kiosk-app distribution (https://github.com/M2tec/m2_kiosk_app).
@@ -23,11 +23,8 @@ from payment_types import *
 import m2_util
 from pprint import pprint
 import signal
-import requests
-import json
 import socket
 import platform
-import argparse
 import os
 import request_handlers as rh
 import random
@@ -93,40 +90,8 @@ if __name__ == "__main__":
     server.add_handler("/payment-request", rh.payment_request, data)
     server.add_handler("/payment-status", rh.payment_status, data)
     server.add_handler("/clear-display", rh.clear_display_request, data)
-
-    # Connect start panel to server object
-    server.start_main_box = builder.get_object("start_main_box")
-    server.vendor_image = builder.get_object("vendor_image")
-    m2_util.set_payment_image(server.vendor_image)
-
-    # Connect payment panel to server object
-    server.payment_main_box = builder.get_object("payment_main_box")
-    window3 = builder.get_object("window3")
-    window3.remove(server.payment_main_box)
-
-    server.payment_image = builder.get_object("payment_image")
-    server.token_name = builder.get_object("token_name")
-    server.token_image = builder.get_object("token_image")
-    server.payment_label = builder.get_object("amount_label")
-
-    server.payment_image_event = builder.get_object("payment_image_event")
-    m2_util.set_payment_image(server.payment_image)
-
-    # Connect admin panel to server object
-    server.admin_main_box = builder.get_object("admin_main_box")
-    window2 = builder.get_object("window2")
-    window2.remove(server.admin_main_box)
-
-    server.pin_entry_obj = builder.get_object("pin_label")
-    server.ip_address_info = builder.get_object("ip_address_info")
-
-    # Connect tip panel to server object
-    server.tip_main_box = builder.get_object("tip_main_box")
-    window4 = builder.get_object("window4")
-    window4.remove(server.tip_main_box)
-
-    server.tip_digits = ''
-    server.tip_amount_label = builder.get_object("tip_amount_label")
+    server.add_handler("/save-configuration", rh.save_configuration_request, data)   
+    server.add_handler("/load-configuration", rh.load_configuration_request, data)   
 
     # Handlers are defined in the glade file in the widget properties -> signal tab
     # signal handler name should be the same ase the function name
@@ -139,10 +104,6 @@ if __name__ == "__main__":
             Gtk.main_quit(*args)
             print("Exiting...")
                
-        def button_released(self, button):
-            print(button.get_name())  
-            print(self.data)
-
         def change_panel(self, widget, arg=1):
             print(arg)
             widget_name = widget.get_name()
@@ -171,8 +132,8 @@ if __name__ == "__main__":
                 panel = self.server.start_main_box
                       
             rh.remove_child_widget(self.server)
-            server.window1.add(panel)
-            server.window1.show_all()        
+            self.server.window1.add(panel)
+            self.server.window1.show_all()        
 
 
         def on_admin_pad_button_release_event(self, widget):
@@ -271,6 +232,41 @@ if __name__ == "__main__":
     #server.builder_env = builder
     builder.connect_signals(Handlers())
 
+    # Connect start panel to server object
+    server.start_main_box = builder.get_object("start_main_box")
+    server.vendor_image = builder.get_object("vendor_image")
+    m2_util.set_payment_image(server.vendor_image)
+
+    # Connect payment panel to server object
+    server.payment_main_box = builder.get_object("payment_main_box")
+    window3 = builder.get_object("window3")
+    window3.remove(server.payment_main_box)
+
+    server.payment_image = builder.get_object("payment_image")
+    server.token_name = builder.get_object("token_name")
+    server.token_image = builder.get_object("token_image")
+    server.payment_label = builder.get_object("amount_label")
+
+    server.payment_image_event = builder.get_object("payment_image_event")
+    m2_util.set_payment_image(server.payment_image)
+
+    # Connect admin panel to server object
+    server.admin_main_box = builder.get_object("admin_main_box")
+    window2 = builder.get_object("window2")
+    window2.remove(server.admin_main_box)
+
+    server.pin_entry_obj = builder.get_object("pin_label")
+    server.ip_address_info = builder.get_object("ip_address_info")
+
+    # Connect tip panel to server object
+    server.tip_main_box = builder.get_object("tip_main_box")
+    window4 = builder.get_object("window4")
+    window4.remove(server.tip_main_box)
+
+    server.tip_digits = ''
+    server.tip_amount_label = builder.get_object("tip_amount_label")
+
+
     # Setup main window
     headerbar = Gtk.HeaderBar()
     headerbar.set_title("M2 PayPad")
@@ -285,7 +281,6 @@ if __name__ == "__main__":
     if platform.machine() != 'x86_64':
         fullscreen_at_monitor(server.window1, 0)
 
-    server.window1.connect('destroy', Gtk.main_quit)
     GLib.unix_signal_add(GLib.PRIORITY_DEFAULT, signal.SIGINT, Gtk.main_quit)
  
     Gtk.main()

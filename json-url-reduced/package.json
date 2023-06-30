@@ -9,8 +9,9 @@
   "author": "",
   "license": "GPLv3",
   "dependencies": {
+    "lzma": "^2.3.2",
     "msgpack5": "^4.2.1",
     "node-lzw": "^0.3.1",
-	"urlsafe-base64": "^1.0.0"
+    "urlsafe-base64": "^1.0.0"
   }
 }

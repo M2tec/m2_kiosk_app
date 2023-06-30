@@ -93,7 +93,7 @@ def qr_code(json_dict):
 
     #response = execute_js(json_root, tx_file_name + '.json')
 
-    print(url)
+    print("URL:" + url)
 
     img = qrcode.make(url)
     type(img)  # qrcode.image.pil.PilImage

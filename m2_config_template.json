@@ -4,11 +4,48 @@
         "locale_setting": "nl_NL.UTF-8"
     },
     "cardano": {
-        "network_type": "mainnet",
+        "network_type": "testnet",
         "mainnet_wallet_address": "",
         "testnet_wallet_address": "",
         "payment_type": "gamechanger",
-        "payment_validator": "koios"
+        "payment_validator": "koios",
+        "networks": [
+            {
+                "name": "testnet",
+                "selected_token": "tADA",
+                "tokens": [
+                    {
+                        "name": "tada",
+                        "policyID": "ada"
+                    },
+                    {
+                        "name": "FakeUSD",
+                        "policyID": "2f7e0f588efe4e2836c829c50619a498ddf5521255bf5e1e9f9f5a13"
+                    }
+                ]
+            },
+            {
+                "name": "mainnet",
+                "selected_token": "PROXIE",
+                "tokens": [
+                    {
+                        "name": "ADA",
+                        "policyID": "ada"
+                    },
+                    {
+                        "name": "PROXIE",
+                        "policyID": "20cd68533b47565f3c61efb39c30fdace9963bfa4c0060b613448e3c"
+                    },
+                    {
+                        "name": "DJED",
+                        "policyID": "8db269c3ec630e06ae29f74bc39edd1f87c819f1056206e879a1cd61"
+                    },
+                    {
+                        "name": "iUSD",
+                        "policyID": "66d78b4a3cb3d37afa0ec36461e51ecbde00f26c8f0a68f94b69880"
+                    }
+                ]
+            }
+        ]
     }
 }
-

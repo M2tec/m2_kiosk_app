@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.38.2 -->
+<!-- Generated with glade 3.40.0 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
   <object class="GtkWindow" id="window1">
     <property name="name">M2 Paypad</property>
-    <property name="width-request">700</property>
-    <property name="height-request">400</property>
+    <property name="width-request">480</property>
+    <property name="height-request">800</property>
     <property name="can-focus">False</property>
     <property name="hide-titlebar-when-maximized">True</property>
+    <signal name="destroy" handler="onDeleteWindow" swapped="no"/>
     <child>
       <object class="GtkBox" id="start_main_box">
         <property name="name">start_main_box</property>
@@ -17,6 +18,28 @@
         <property name="margin-top">15</property>
         <property name="margin-bottom">15</property>
         <property name="hexpand">False</property>
+        <property name="orientation">vertical</property>
+        <child>
+          <object class="GtkEventBox" id="vendor_image_event">
+            <property name="name">admin_enable</property>
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <signal name="button-release-event" handler="change_panel" swapped="no"/>
+            <child>
+              <object class="GtkImage" id="vendor_image">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="pixbuf">static/m2tec_logo.jpg</property>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="padding">15</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
         <child>
           <object class="GtkButton" id="tip_enable">
             <property name="name">tip_enable</property>
@@ -39,27 +62,6 @@
           <packing>
             <property name="expand">True</property>
             <property name="fill">True</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkEventBox" id="vendor_image_event">
-            <property name="name">admin_enable</property>
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-            <signal name="button-release-event" handler="change_panel" swapped="no"/>
-            <child>
-              <object class="GtkImage" id="vendor_image">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="pixbuf">static/m2tec_logo.jpg</property>
-              </object>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">False</property>
-            <property name="padding">15</property>
             <property name="pack-type">end</property>
             <property name="position">1</property>
           </packing>
@@ -68,30 +70,28 @@
     </child>
   </object>
   <object class="GtkWindow" id="window2">
-    <property name="width-request">700</property>
-    <property name="height-request">400</property>
+    <property name="width-request">480</property>
+    <property name="height-request">800</property>
     <property name="can-focus">False</property>
     <child>
       <object class="GtkBox" id="admin_main_box">
         <property name="name">admin_main_box</property>
         <property name="visible">True</property>
         <property name="can-focus">False</property>
-        <property name="margin-start">15</property>
-        <property name="margin-end">15</property>
-        <property name="margin-top">15</property>
-        <property name="margin-bottom">15</property>
+        <property name="margin-start">2</property>
+        <property name="margin-end">2</property>
+        <property name="margin-top">2</property>
+        <property name="margin-bottom">2</property>
         <property name="orientation">vertical</property>
         <child>
           <!-- n-columns=3 n-rows=4 -->
           <object class="GtkGrid" id="admin_grid_box">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
-            <property name="margin-left">140</property>
-            <property name="margin-right">140</property>
-            <property name="margin-start">130</property>
-            <property name="margin-end">130</property>
-            <property name="margin-top">30</property>
-            <property name="margin-bottom">15</property>
+            <property name="margin-start">5</property>
+            <property name="margin-end">5</property>
+            <property name="margin-top">5</property>
+            <property name="margin-bottom">5</property>
             <property name="hexpand">True</property>
             <property name="vexpand">True</property>
             <child>
@@ -320,8 +320,8 @@
   </object>
   <object class="GtkWindow" id="window3">
     <property name="name">M2 Paypad</property>
-    <property name="width-request">700</property>
-    <property name="height-request">400</property>
+    <property name="width-request">480</property>
+    <property name="height-request">800</property>
     <property name="can-focus">False</property>
     <property name="hide-titlebar-when-maximized">True</property>
     <child>
@@ -333,77 +333,11 @@
         <property name="margin-top">15</property>
         <property name="margin-bottom">15</property>
         <property name="hexpand">False</property>
+        <property name="orientation">vertical</property>
         <child>
           <object class="GtkBox" id="payment_box">
             <property name="can-focus">False</property>
             <property name="orientation">vertical</property>
-            <child>
-              <object class="GtkLabel">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="double-buffered">False</property>
-                <property name="halign">start</property>
-                <property name="hexpand">False</property>
-                <property name="label" translatable="yes">Complete Payment</property>
-                <attributes>
-                  <attribute name="font-desc" value="Sans Bold 21"/>
-                </attributes>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="halign">start</property>
-                <property name="margin-top">15</property>
-                <property name="hexpand">True</property>
-                <property name="label" translatable="yes">Use the gamechanger app 
-to scan the qr-code</property>
-                <attributes>
-                  <attribute name="font-desc" value="Sans 14"/>
-                </attributes>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="double-buffered">False</property>
-                <property name="vexpand">True</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">2</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel" id="token_name">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="halign">start</property>
-                <property name="hexpand">True</property>
-                <property name="label" translatable="yes">ADA</property>
-                <attributes>
-                  <attribute name="font-desc" value="Sans Bold 23"/>
-                </attributes>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">3</property>
-              </packing>
-            </child>
             <child>
               <object class="GtkImage">
                 <property name="visible">True</property>
@@ -463,6 +397,7 @@ to scan the qr-code</property>
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
+            <property name="pack-type">end</property>
             <property name="position">0</property>
           </packing>
         </child>
@@ -482,7 +417,6 @@ to scan the qr-code</property>
             <property name="expand">False</property>
             <property name="fill">False</property>
             <property name="padding">15</property>
-            <property name="pack-type">end</property>
             <property name="position">2</property>
           </packing>
         </child>
@@ -490,8 +424,8 @@ to scan the qr-code</property>
     </child>
   </object>
   <object class="GtkWindow" id="window4">
-    <property name="width-request">700</property>
-    <property name="height-request">400</property>
+    <property name="width-request">480</property>
+    <property name="height-request">800</property>
     <property name="can-focus">False</property>
     <child>
       <object class="GtkBox" id="tip_main_box">
@@ -502,6 +436,7 @@ to scan the qr-code</property>
         <property name="margin-top">15</property>
         <property name="margin-bottom">15</property>
         <property name="hexpand">False</property>
+        <property name="orientation">vertical</property>
         <child>
           <object class="GtkBox" id="tip_text_box">
             <property name="can-focus">False</property>
@@ -510,61 +445,9 @@ to scan the qr-code</property>
               <object class="GtkLabel">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="double-buffered">False</property>
                 <property name="halign">start</property>
-                <property name="hexpand">False</property>
+                <property name="hexpand">True</property>
                 <property name="label" translatable="yes">Tip amount</property>
-                <attributes>
-                  <attribute name="font-desc" value="Sans Bold 21"/>
-                </attributes>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="halign">start</property>
-                <property name="margin-top">15</property>
-                <property name="hexpand">True</property>
-                <property name="label" translatable="yes">You can provide a tip of your
-choosing. Enter the amount
-on the right and press OK. 
-Minimum amount is 1 ADA.</property>
-                <attributes>
-                  <attribute name="font-desc" value="Sans 14"/>
-                </attributes>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel" id="label2">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="double-buffered">False</property>
-                <property name="vexpand">True</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">2</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="halign">start</property>
-                <property name="hexpand">True</property>
-                <property name="label" translatable="yes">Amount</property>
                 <attributes>
                   <attribute name="font-desc" value="Sans Bold 23"/>
                 </attributes>
@@ -636,6 +519,7 @@ Minimum amount is 1 ADA.</property>
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
+            <property name="pack-type">end</property>
             <property name="position">0</property>
           </packing>
         </child>
@@ -888,7 +772,7 @@ Minimum amount is 1 ADA.</property>
             </child>
           </object>
           <packing>
-            <property name="expand">False</property>
+            <property name="expand">True</property>
             <property name="fill">True</property>
             <property name="position">1</property>
           </packing>
