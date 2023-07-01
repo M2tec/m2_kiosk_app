@@ -13,10 +13,6 @@
       <object class="GtkBox" id="start_main_box">
         <property name="name">start_main_box</property>
         <property name="can-focus">False</property>
-        <property name="margin-start">15</property>
-        <property name="margin-end">15</property>
-        <property name="margin-top">15</property>
-        <property name="margin-bottom">15</property>
         <property name="hexpand">False</property>
         <property name="orientation">vertical</property>
         <child>
@@ -36,7 +32,6 @@
           <packing>
             <property name="expand">False</property>
             <property name="fill">False</property>
-            <property name="padding">15</property>
             <property name="position">0</property>
           </packing>
         </child>
@@ -46,7 +41,10 @@
             <property name="visible">True</property>
             <property name="can-focus">True</property>
             <property name="receives-default">True</property>
-            <property name="margin-end">15</property>
+            <property name="margin-start">5</property>
+            <property name="margin-end">5</property>
+            <property name="margin-top">5</property>
+            <property name="margin-bottom">5</property>
             <signal name="released" handler="change_panel" swapped="no"/>
             <child>
               <object class="GtkLabel">
@@ -78,10 +76,6 @@
         <property name="name">admin_main_box</property>
         <property name="visible">True</property>
         <property name="can-focus">False</property>
-        <property name="margin-start">2</property>
-        <property name="margin-end">2</property>
-        <property name="margin-top">2</property>
-        <property name="margin-bottom">2</property>
         <property name="orientation">vertical</property>
         <child>
           <!-- n-columns=3 n-rows=4 -->
@@ -328,16 +322,32 @@
       <object class="GtkBox" id="payment_main_box">
         <property name="name">payment_main_box</property>
         <property name="can-focus">False</property>
-        <property name="margin-start">15</property>
-        <property name="margin-end">15</property>
-        <property name="margin-top">15</property>
-        <property name="margin-bottom">15</property>
         <property name="hexpand">False</property>
         <property name="orientation">vertical</property>
         <child>
           <object class="GtkBox" id="payment_box">
             <property name="can-focus">False</property>
+            <property name="margin-start">5</property>
+            <property name="margin-end">5</property>
+            <property name="margin-bottom">5</property>
             <property name="orientation">vertical</property>
+            <child>
+              <object class="GtkLabel" id="token_name">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="halign">start</property>
+                <property name="hexpand">True</property>
+                <property name="label" translatable="yes">ADA</property>
+                <attributes>
+                  <attribute name="font-desc" value="Sans Bold 23"/>
+                </attributes>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
             <child>
               <object class="GtkImage">
                 <property name="visible">True</property>
@@ -416,7 +426,6 @@
           <packing>
             <property name="expand">False</property>
             <property name="fill">False</property>
-            <property name="padding">15</property>
             <property name="position">2</property>
           </packing>
         </child>
@@ -431,15 +440,15 @@
       <object class="GtkBox" id="tip_main_box">
         <property name="name">tip_main_box</property>
         <property name="can-focus">False</property>
-        <property name="margin-start">15</property>
-        <property name="margin-end">15</property>
-        <property name="margin-top">15</property>
-        <property name="margin-bottom">15</property>
         <property name="hexpand">False</property>
         <property name="orientation">vertical</property>
         <child>
           <object class="GtkBox" id="tip_text_box">
             <property name="can-focus">False</property>
+            <property name="margin-start">5</property>
+            <property name="margin-end">5</property>
+            <property name="margin-top">5</property>
+            <property name="margin-bottom">5</property>
             <property name="orientation">vertical</property>
             <child>
               <object class="GtkLabel">

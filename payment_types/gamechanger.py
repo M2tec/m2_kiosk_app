@@ -23,8 +23,44 @@ import requests
 from pprint import pprint
 import os
 
-from Naked.toolshed.shell import execute_js, muterun_js
 import qrcode
+import qrcode.image.svg
+
+import json
+import brotli
+import base64
+
+def base64_encode(string):
+    """
+    Removes any `=` used as padding from the encoded string.
+    """
+    encoded = base64.urlsafe_b64encode(string)
+    return encoded.rstrip(b"=").rstrip(b"\n")
+
+
+def base64_decode(string):
+    """
+    Adds back in the required padding before decoding.
+    """
+    padding = 4 - (len(string) % 4)
+    string = string + (b"=" * padding)
+    return base64.urlsafe_b64decode(string)
+
+def json_deindent(data):
+    #data = json.loads(data)
+    data = json.dumps(data, ensure_ascii=False, separators=(',', ':'))
+    return data
+
+def gc_encode(gc_script):
+    json_string = json_deindent(gc_script)
+    brotli_data = brotli.compress(json_string.encode())
+    url_string = base64_encode(brotli_data)
+    return url_string.decode()
+
+def gc_decode(url_string):
+    brotli_data = base64_decode(url_string.encode())
+    json_string = brotli.decompress(brotli_data)
+    return json_string.decode()
 
 
 def cardano_transaction_json(json_dict):
@@ -66,40 +102,30 @@ def cardano_transaction_json(json_dict):
 
 def qr_code(json_dict):
     print('-------- qr_code ----------')
-      
+    print(json_dict)      
     network_type = json_dict["network_type"]
     transaction_id = str(json_dict["transaction_id"])
     
     tx_json = cardano_transaction_json(json_dict)
-    
-    tx_file_name = '/tmp/shop_data-' + transaction_id
-    
-    with open(tx_file_name + '.json', 'w') as outfile:
-        json.dump(tx_json, outfile)
-    
-    tx_file_name = '/tmp/shop_data-' + transaction_id
-    print(tx_file_name)
-
-    ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Root
-    json_url_path = ROOT_DIR + '/../json-url-reduced/json-url-reduced.js'
-
+  
     # Generate qr code 
-    print('json file: \t' + tx_file_name + '.json')
-    tx_file_name_json = tx_file_name + '.json'
-    arg_in = f"{network_type} {tx_file_name_json}"
-
-    response = muterun_js(json_url_path, arg_in)
-    url = response.stdout.decode("utf-8").replace("\n", "")
-
-    #response = execute_js(json_root, tx_file_name + '.json')
+    url = gc_encode(tx_json)
 
     print("URL:" + url)
 
-    img = qrcode.make(url)
-    type(img)  # qrcode.image.pil.PilImage
-    img.save(tx_file_name + '.png')
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=22,
+        border=2,
+        image_factory=qrcode.image.svg.SvgPathFillImage
+    )
 
-    return tx_file_name + '.png'
+    qr.add_data(url)
+    qr.make()
+    img = qr.make_image(back_color="white")
+    
+    return img.to_string()
 
 
 

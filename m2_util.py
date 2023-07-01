@@ -50,12 +50,21 @@ def get_config_data():
     return config_data
 
 
-def set_payment_image(image1, image_file=ROOT_DIR + '/static/m2tec_logo_github.png'):
-    pixbuf = GdkPixbuf.Pixbuf.new_from_file(image_file)
-    pixbuf = pixbuf.scale_simple(380, 380, GdkPixbuf.InterpType.BILINEAR)
+def set_payment_image(image1, image_data='' ):
+
+    if image_data == '':
+        image_file=ROOT_DIR + '/static/m2tec_logo.svg'
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file(image_file)
+    else:
+        loader = GdkPixbuf.PixbufLoader()
+        loader.write(image_data)
+        loader.close()
+        pixbuf = loader.get_pixbuf()
+
+
+    #pixbuf = pixbuf.scale_simple(480, 480, GdkPixbuf.InterpType.BILINEAR)
     image1.set_from_pixbuf(pixbuf)
-
-
+    
 def is_port_in_use(port):
     import socket
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:

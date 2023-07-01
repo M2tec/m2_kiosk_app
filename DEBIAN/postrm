@@ -1,2 +1,2 @@
-rm -rf /usr/bin/m2-kiosk-app
+rm -rf /usr/local/bin/m2-kiosk-app
 
