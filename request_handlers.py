@@ -77,7 +77,7 @@ def get_config():
 
         try:
             print("Reading config file")
-            f = open("m2_config_template.json", "r")
+            f = open("/usr/local/share/m2-kiosk-app-hyper/m2_config_template.json", "r")
             template_data = f.read()
             f.close()
             print(template_data)
