@@ -104,8 +104,7 @@ if __name__ == "__main__":
             Gtk.main_quit(*args)
             print("Exiting...")
                
-        def change_panel(self, widget, arg=1):
-            print(arg)
+        def change_panel(self, widget, args=1):
             widget_name = widget.get_name()
             print(widget_name)
             
@@ -135,6 +134,12 @@ if __name__ == "__main__":
             self.server.window1.add(panel)
             self.server.window1.show_all()        
 
+        def cancel_payment(self, widget, args):
+            print('cancel')
+            panel = self.server.start_main_box
+            rh.remove_child_widget(self.server)
+            self.server.window1.add(panel)
+            self.server.window1.show_all()    
 
         def on_admin_pad_button_release_event(self, widget):
         # print(widget.get_label())
@@ -147,7 +152,7 @@ if __name__ == "__main__":
             button_label = widget.get_label()
 
             if button_label == "gtk-go-back":
-                # print("back")
+                print("back")
                 admin_panel_disable(self.server)
                 return
 
@@ -215,7 +220,7 @@ if __name__ == "__main__":
 
             rh.payment_request_simple(self.server, json_data)
 
-        def on_tip_clear_button_release_event(server, widget):
+        def on_tip_clear_button_release_event(self, widget):
             self.server.tip_digits = ''
 
             config_data = m2_util.get_config_data()
@@ -225,6 +230,7 @@ if __name__ == "__main__":
             tip_amount = 0
             tip_amount = locale.format_string('%.2f', tip_amount)
             self.server.tip_amount_label.set_text(tip_amount)
+            
 
     # Setup gtk builder
     builder = Gtk.Builder()
