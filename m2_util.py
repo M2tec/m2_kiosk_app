@@ -38,8 +38,9 @@ def get_config_data():
         if platform.machine() == 'x86_64':
             config_folder = HOME_DIR + "/.config/m2-kiosk/"
         else:
-            config_folder = "/var/www/m2-kiosk/.config/"
-
+            #config_folder = "/var/www/m2-kiosk/.config/"
+            config_folder = HOME_DIR + "/.config/m2-kiosk/"
+            
         # print(config_folder)
         config_file = "config.json"
         f = open(config_folder + config_file)
