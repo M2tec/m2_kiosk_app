@@ -64,16 +64,19 @@ def gc_decode_brotli(url_string):
 
 
 def gc_encode_lzw(gc_script):
-    p = subprocess.Popen(['node', 'json-url-reduced/json-url-lzw.js', json.dumps(gc_script)], stdout=subprocess.PIPE)
+    ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Root
+    p = subprocess.Popen(['node', ROOT_DIR + '/../json-url-reduced/json-url-lzw.js', json.dumps(gc_script)], stdout=subprocess.PIPE)
     out = p.stdout.read().decode("utf-8").replace("\n", "")
     #print("Result:" + repr(out))
     return out
 
 def gc_encode_lzma(gc_script):
-    p = subprocess.Popen(['node', 'json-url-reduced/json-url-lzma.js', json.dumps(gc_script)], stdout=subprocess.PIPE)
+    ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Root
+    p = subprocess.Popen(['node', ROOT_DIR + '/../json-url-reduced/json-url-lzma.js', json.dumps(gc_script)], stdout=subprocess.PIPE)
     out = p.stdout.read().decode("utf-8").replace("\n", "")
     #print("Result:" + repr(out))
     return out
+
 
 def cardano_transaction_json(json_dict):
 
@@ -194,7 +197,7 @@ def qr_code(json_dict):
     qr = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
-        box_size=20,
+        box_size=18,
         border=1,
         image_factory=qrcode.image.svg.SvgPathFillImage
     )
@@ -203,11 +206,11 @@ def qr_code(json_dict):
     qr.make()
     img = qr.make_image(back_color="white")
     
-    with open('qr.svg', 'w') as f:
-        f.write(img.to_string().decode())
+    #with open('qr.svg', 'w') as f:
+    #    f.write(img.to_string().decode())
     
     image = img.to_string()
-    print(image)
+    #print(image)
     return image
 
 
