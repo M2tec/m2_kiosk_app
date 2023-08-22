@@ -144,7 +144,7 @@ def payment_request(server, message, path, query, client_context, data):
 
 def payment_request_simple(server, json_dict):
     print("payment_request_simple")
-    print(json_dict)
+    #print(json_dict)
     remove_child_widget(server)
     server.window1.add(server.payment_main_box)
     server.window1.show_all()

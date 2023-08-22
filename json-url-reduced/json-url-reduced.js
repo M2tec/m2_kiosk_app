@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-
 // 
 // This file is part of the m2-kiosk-app distribution (https://github.com/M2tec/m2_kiosk_app).
 // Copyright (c) 2023 Maarten Menheere.
@@ -41,7 +39,7 @@ function tx_encode(tx_json) {
     //buf = Buffer.from(result)
       
     tx_safe64_encoded = safe64.encode(buf);
-    
+    console.log(tx_safe64_encoded.toString())
     return tx_safe64_encoded
 }
 
@@ -57,11 +55,12 @@ function create_url(network_type, gcscript) {
     else if (network_type === 'testnet')
 	    url = 'https://testnet-wallet.gamechanger.finance/api/1/tx/' + gcscript;
     
-    //console.log('\n')
-    console.log(url)
+    console.log('\n')
+    console.log(url.toString())
+    
+    process.stdout.write(url)
+    return url
 }
-
-
 
 var network_type = process.argv[2]
 var json_file_name = process.argv[3]
@@ -90,7 +89,6 @@ var gcscript = {
   }
 }
 
-
 var gcscript = {"type":"tx","title":"Demo","description":"created with gamechanger-dapp-cli","metadata":{"123":{"message":"Hello World!"}}}
 
 var network_type = 'testnet'
@@ -98,6 +96,6 @@ var network_type = 'testnet'
 //console.log(gcscript)
 
 //console.log(network_type + '\n')
-create_url(network_type, gcscript);
+tx_encode(gcscript);
 
 

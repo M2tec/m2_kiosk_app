@@ -194,10 +194,10 @@ if __name__ == "__main__":
 
             network_type = config_data["cardano"]["network_type"]
 
-            if network_type == 'testnet':
-                wallet_address = config_data["cardano"]["testnet_wallet_address"]
-            elif network_type == 'mainnet':
+            if network_type == 'mainnet':
                 wallet_address = config_data["cardano"]["mainnet_wallet_address"]
+            else:
+                wallet_address = config_data["cardano"]["testnet_wallet_address"]
 
             randomID = random.randint(0, 9999)
 
@@ -212,7 +212,7 @@ if __name__ == "__main__":
                 "transaction_id": transaction_id,
                 "wallet_address": wallet_address,
                 "token_policyID": "ada",
-                "token_name": "ADA",
+                "token_name": "ada",
                 "amount": tip_amount}
 
             pprint(json_data)

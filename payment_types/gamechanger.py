@@ -51,17 +51,29 @@ def json_deindent(data):
     data = json.dumps(data, ensure_ascii=False, separators=(',', ':'))
     return data
 
-def gc_encode(gc_script):
+def gc_encode_brotli(gc_script):
     json_string = json_deindent(gc_script)
     brotli_data = brotli.compress(json_string.encode())
     url_string = base64_encode(brotli_data)
     return url_string.decode()
 
-def gc_decode(url_string):
+def gc_decode_brotli(url_string):
     brotli_data = base64_decode(url_string.encode())
     json_string = brotli.decompress(brotli_data)
     return json_string.decode()
 
+
+def gc_encode_lzw(gc_script):
+    p = subprocess.Popen(['node', 'json-url-reduced/json-url-lzw.js', json.dumps(gc_script)], stdout=subprocess.PIPE)
+    out = p.stdout.read().decode("utf-8").replace("\n", "")
+    #print("Result:" + repr(out))
+    return out
+
+def gc_encode_lzma(gc_script):
+    p = subprocess.Popen(['node', 'json-url-reduced/json-url-lzma.js', json.dumps(gc_script)], stdout=subprocess.PIPE)
+    out = p.stdout.read().decode("utf-8").replace("\n", "")
+    #print("Result:" + repr(out))
+    return out
 
 def cardano_transaction_json(json_dict):
 
@@ -96,6 +108,59 @@ def cardano_transaction_json(json_dict):
 
     #print(json.dumps(transaction_dict, indent=4, sort_keys=True))
 
+    return transaction_dict
+
+def cardano_transaction_json_v2(json_dict):
+
+    network_type = json_dict["network_type"]
+    wallet_address = json_dict["wallet_address"]
+    transaction_id = str(json_dict["transaction_id"])
+    token_policyID = json_dict["token_policyID"]
+    token_name = json_dict["token_name"]
+    requested_amount = float(json_dict["amount"]) * 1000000
+
+    metadata_dict = {
+        '123': {'message': transaction_id}
+    }
+    assets_list = [{
+        'quantity': str(int(requested_amount)),
+        'policyId': token_policyID,
+        'assetName': token_name
+    }]
+
+    outputs_dict = {
+        'type': 'buildTx',
+        'tx': {
+            'outputs': [
+                { 
+                    'address': wallet_address,
+                    'assets': assets_list
+                }
+            ]
+        }
+    }
+
+    sign_dict =         {
+            "type": "signTxs",
+            "detailedPermissions": False,
+            "txs": [
+                "{get('cache.0.txHex')}"
+            ]
+        }
+
+    submit_dict = {
+            "type": "submitTxs",
+            "txs": "{get('cache.1')}"
+        }
+
+    transaction_dict = {
+        'type': 'script',
+        'title': transaction_id,
+        'description' : 'M2tec POS transaction',
+        'run': [ outputs_dict, sign_dict, submit_dict ]    
+    }
+
+    #print(json.dumps(transaction_dict, indent=4, sort_keys=True))
 
     return transaction_dict
 
@@ -105,19 +170,32 @@ def qr_code(json_dict):
     print(json_dict)      
     network_type = json_dict["network_type"]
     transaction_id = str(json_dict["transaction_id"])
-    
-    tx_json = cardano_transaction_json(json_dict)
-  
-    # Generate qr code 
-    url = gc_encode(tx_json)
+   
+    if network_type == 'mainnet':
+        tx_json = cardano_transaction_json(json_dict)
+        gcscript = gc_encode_lzw(tx_json)
+        url = "https://wallet.gamechanger.finance/api/1/tx/" + gcscript
+    elif network_type == 'preprod':
+        tx_json = cardano_transaction_json(json_dict)
+        gcscript = gc_encode_lzw(tx_json)
+        url = 'https://preprod-wallet.gamechanger.finance/api/1/tx/' + gcscript
+    elif network_type == "beta":
+        tx_json = cardano_transaction_json_v2(json_dict)
+        gcscript = gc_encode_lzma(tx_json)
+        url = "https://beta-preprod-wallet.gamechanger.finance/api/2/run/" + gcscript
+    elif network_type == "beta-brotli":
+        tx_json = cardano_transaction_json_v2(json_dict)
+        gcscript = gc_encode_brotli(tx_json)
+        url = "https://beta-preprod-wallet.gamechanger.finance/api/2/run/" + gcscript
 
-    print("URL:" + url)
+
+    print("\n" + url)
 
     qr = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
-        box_size=22,
-        border=2,
+        box_size=20,
+        border=1,
         image_factory=qrcode.image.svg.SvgPathFillImage
     )
 
@@ -125,7 +203,12 @@ def qr_code(json_dict):
     qr.make()
     img = qr.make_image(back_color="white")
     
-    return img.to_string()
+    with open('qr.svg', 'w') as f:
+        f.write(img.to_string().decode())
+    
+    image = img.to_string()
+    print(image)
+    return image
 
 
 
