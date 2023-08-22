@@ -197,7 +197,7 @@ def qr_code(json_dict):
     qr = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
-        box_size=18,
+        box_size=16,
         border=1,
         image_factory=qrcode.image.svg.SvgPathFillImage
     )
