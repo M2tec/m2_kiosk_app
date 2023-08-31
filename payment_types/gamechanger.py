@@ -80,16 +80,12 @@ def gc_encode_lzma(gc_script):
 
 def cardano_transaction_json(json_dict):
 
-    network_type = json_dict["network_type"]
     wallet_address = json_dict["wallet_address"]
     transaction_id = str(json_dict["transaction_id"])
     token_policyID = json_dict["token_policyID"]
     token_name = json_dict["token_name"]
     requested_amount = float(json_dict["amount"]) * 1000000
 
-    metadata_dict = {
-        '123': {'message': transaction_id}
-    }
     amounts_dict_1 = {
         'quantity': str(int(requested_amount)),
         'policyId': token_policyID,
@@ -115,16 +111,12 @@ def cardano_transaction_json(json_dict):
 
 def cardano_transaction_json_v2(json_dict):
 
-    network_type = json_dict["network_type"]
     wallet_address = json_dict["wallet_address"]
     transaction_id = str(json_dict["transaction_id"])
     token_policyID = json_dict["token_policyID"]
     token_name = json_dict["token_name"]
     requested_amount = float(json_dict["amount"]) * 1000000
 
-    metadata_dict = {
-        '123': {'message': transaction_id}
-    }
     assets_list = [{
         'quantity': str(int(requested_amount)),
         'policyId': token_policyID,
@@ -167,6 +159,33 @@ def cardano_transaction_json_v2(json_dict):
 
     return transaction_dict
 
+def cardano_transaction_json_gcfs(json_dict):
+
+    wallet_address = json_dict["wallet_address"]
+    transaction_id = str(json_dict["transaction_id"])
+    requested_amount = float(json_dict["amount"]) * 1000000
+
+    transaction_dict = {
+        "type": "script",
+        "run": {
+        "A": {
+            "type": "importAsScript",
+            "args": {
+            "txId": transaction_id,
+            "ada": str(int(requested_amount)),
+            "wallet": wallet_address
+            },
+            "from": [
+            "gcfs://76897e6636ea9eefd37aaab82a8670394f84f2db29854bef8801552a.m2@latest://pay.gcscript"
+            ]
+        }
+        }
+    }
+
+    #print(json.dumps(transaction_dict, indent=4, sort_keys=True))
+
+    return transaction_dict
+
 
 def qr_code(json_dict):
     print('-------- qr_code ----------')
@@ -174,23 +193,30 @@ def qr_code(json_dict):
     network_type = json_dict["network_type"]
     transaction_id = str(json_dict["transaction_id"])
    
-    if network_type == 'mainnet':
+    if network_type == 'Mainnet':
         tx_json = cardano_transaction_json(json_dict)
         gcscript = gc_encode_lzw(tx_json)
         url = "https://wallet.gamechanger.finance/api/1/tx/" + gcscript
-    elif network_type == 'preprod':
+
+    elif network_type == 'Preprod':
         tx_json = cardano_transaction_json(json_dict)
         gcscript = gc_encode_lzw(tx_json)
         url = 'https://preprod-wallet.gamechanger.finance/api/1/tx/' + gcscript
-    elif network_type == "beta":
+
+    elif network_type == "Beta":
         tx_json = cardano_transaction_json_v2(json_dict)
         gcscript = gc_encode_lzma(tx_json)
         url = "https://beta-preprod-wallet.gamechanger.finance/api/2/run/" + gcscript
-    elif network_type == "beta-brotli":
+
+    elif network_type == "Beta-gcfs":
+        tx_json = cardano_transaction_json_gcfs(json_dict)
+        gcscript = gc_encode_lzma(tx_json)
+        url = "https://beta-preprod-wallet.gamechanger.finance/api/2/run/" + gcscript      
+
+    elif network_type == "Beta-brotli":
         tx_json = cardano_transaction_json_v2(json_dict)
         gcscript = gc_encode_brotli(tx_json)
         url = "https://beta-preprod-wallet.gamechanger.finance/api/2/run/" + gcscript
-
 
     print("\n" + url)
 

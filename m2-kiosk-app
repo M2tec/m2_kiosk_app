@@ -194,10 +194,7 @@ if __name__ == "__main__":
 
             network_type = config_data["cardano"]["network_type"]
 
-            if network_type == 'mainnet':
-                wallet_address = config_data["cardano"]["mainnet_wallet_address"]
-            else:
-                wallet_address = config_data["cardano"]["testnet_wallet_address"]
+            wallet_address = config_data["cardano"]['networks'][network_type]["wallet_address"]
 
             randomID = random.randint(0, 9999)
 
