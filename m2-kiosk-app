@@ -169,7 +169,7 @@ if __name__ == "__main__":
             if len(self.server.tip_digits) >= 6:
                 return
 
-            tip_digit = widget.get_label()
+            tip_digit = widget.get_child().get_label()
             # print(tip_digit)
 
             self.server.tip_digits += tip_digit
