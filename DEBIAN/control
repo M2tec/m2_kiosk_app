@@ -1,5 +1,5 @@
-Package: m2-kiosk-app
-Version: 0.138
+Package: m2-kiosk-app-hyper
+Version: 0.1
 Maintainer: M2tec
 Architecture: all
-Description: Cardano payment app 
+Description: Cardano payment app hyperpixel 

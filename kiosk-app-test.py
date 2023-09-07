@@ -20,13 +20,19 @@
 import requests
 
 url = "http://localhost:9090/payment-request"
+network_type = "testnet"
 title = '00051-003-0003'
+token_name = 'ADA'
+token_policyID = 'ada'
 wallet_address = 'addr_test1qzn58ztr9t4eaxxzg4nxr7drzfe4gpl0rkx0rjjp70q3nzwm4uhvu74emhsyrtpqpqjt0hk2mflktqrvl3dn5hym6pes9nrq8r'
 pay_amount = '6.38'
 r = requests.post(
     url,
     json={
+        "network_type": network_type,
         "transaction_id": title,
+        "token_name": token_name,
+        "token_policyID": token_policyID,
         "wallet_address": wallet_address,
         "amount": pay_amount})
 print(r.status_code)

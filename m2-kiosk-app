@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 #
 # This file is part of the m2-kiosk-app distribution (https://github.com/M2tec/m2_kiosk_app).
@@ -19,18 +19,17 @@
 
 from payment_validators import *
 from payment_types import *
-from m2_util import *
+
+import m2_util
 from pprint import pprint
-import requests
-import json
+import signal
 import socket
 import platform
-import argparse
 import os
 import request_handlers as rh
 import random
 from datetime import datetime
-# import locale
+import locale
 
 import gi
 gi.require_version('Gdk', '3.0')
@@ -41,19 +40,7 @@ from gi.repository import Gio, GLib, Gdk, Gtk, GdkPixbuf, Soup  # NOQA
 # This is your Project Root
 ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
 
-# Handle command line arguments
-parser = argparse.ArgumentParser(
-    description='M2 Kiosk App for processing blockchain payments.')
-parser.add_argument('-t', '--test-mode', help='Start in test mode')
-parser.add_argument(
-    '-p',
-    '--odoo-port',
-    help='Specify Odoo port number',
-    default='8069')
-args = parser.parse_args()
-
 secret_code = "1199"
-
 
 def get_host_ip():
     try:
@@ -94,138 +81,6 @@ def fullscreen_at_monitor(window, n):
     window.fullscreen()
     window.Decorated = False
 
-
-def on_admin_pad_button_press_event(widget, event, server):
-    # print(widget.get_label())
-
-    pin_entry = server.pin_entry_obj.get_label()
-
-    if len(pin_entry) >= 4:
-        pin_entry = ''
-
-    button_label = widget.get_label()
-
-    if button_label == "gtk-go-back":
-        # print("back")
-        admin_panel_disable(server)
-        return
-
-    pin_entry += button_label
-    # print(pin_entry)
-
-    if pin_entry == secret_code:
-        Gtk.main_quit()
-
-    server.pin_entry_obj.set_label(pin_entry)
-
-
-def on_tip_pad_button_press_event(widget, event, server):
-
-    if len(server.tip_digits) >= 6:
-        return
-
-    tip_digit = widget.get_label()
-    # print(tip_digit)
-
-    server.tip_digits += tip_digit
-    # print(server.tip_digits)
-
-    tip_amount = int(server.tip_digits) / 100
-    # print(tip_amount)
-
-    config_data = get_config_data()
-    locale_setting = config_data["globals"]["locale_setting"]
-    locale.setlocale(locale.LC_ALL, locale_setting)
-
-    tip_amount = locale.format_string('%.2f', tip_amount, grouping=True)
-    server.tip_amount_label.set_text(tip_amount)
-
-
-def on_tip_pad_ok_press_event(widget, event, server):
-    print("Tip amount = " + server.tip_digits)
-    tip_amount = int(server.tip_digits) / 100
-
-    config_data = get_config_data()
-
-    network_type = config_data["cardano"]["network_type"]
-
-    if network_type == 'testnet':
-        wallet_address = config_data["cardano"]["testnet_wallet_address"]
-    elif network_type == 'mainnet':
-        wallet_address = config_data["cardano"]["mainnet_wallet_address"]
-
-    randomID = random.randint(0, 9999)
-
-    now = datetime.now()
-    d1 = now.strftime("%y%m%d-%H%M")
-
-    transaction_id = d1 + "-" + str(randomID)
-    print(transaction_id)
-
-    json_data = {
-        "network_type": network_type,
-        "transaction_id": transaction_id,
-        "wallet_address": wallet_address,
-        "token_policyID": "ada",
-        "token_name": "ADA",
-        "amount": tip_amount}
-
-    pprint(json_data)
-    print()
-
-    rh.payment_request_simple(server, json_data)
-
-
-def on_tip_clear_button_press_event(widget, event, server):
-    server.tip_digits = ''
-
-    config_data = get_config_data()
-    locale_setting = config_data["globals"]["locale_setting"]
-    locale.setlocale(locale.LC_ALL, locale_setting)
-
-    tip_amount = 0
-    tip_amount = locale.format_string('%.2f', tip_amount)
-    server.tip_amount_label.set_text(tip_amount)
-
-
-def tip_panel_enable(widget, event, server):
-    rh.remove_child_widget(server)
-    server.window1.add(server.tip_main_box)
-    server.window1.show_all()
-
-    tip_amount = 0
-    tip_amount = locale.format_string('%.2f', tip_amount)
-    server.tip_amount_label.set_text(tip_amount)
-
-
-def tip_panel_disable(widget, event, server):
-    rh.remove_child_widget(server)
-    server.window1.add(server.start_main_box)
-    server.window1.show_all()
-
-
-def admin_panel_enable(widget, event, server):
-
-    try:
-        host_ip = get_host_ip()
-        dns_name = get_domain_name(host_ip)
-        server.ip_address_info.set_text("https://" + dns_name + "  or  https://" + host_ip)
-    except Exception as e:
-        print(e)
-        dns_name = ""
-        pass
-
-    rh.remove_child_widget(server)
-    server.window1.add(server.admin_main_box)
-    server.window1.show_all()
-
-
-def admin_panel_disable(server):
-    rh.remove_child_widget(server)
-    server.window1.add(server.start_main_box)
-    server.window1.show_all()
-
-
 if __name__ == "__main__":
 
     # Create a server to listen to requests
@@ -235,22 +90,155 @@ if __name__ == "__main__":
     server.add_handler("/payment-request", rh.payment_request, data)
     server.add_handler("/payment-status", rh.payment_status, data)
     server.add_handler("/clear-display", rh.clear_display_request, data)
+    server.add_handler("/save-configuration", rh.save_configuration_request, data)   
+    server.add_handler("/load-configuration", rh.load_configuration_request, data)   
+
+    # Handlers are defined in the glade file in the widget properties -> signal tab
+    # signal handler name should be the same ase the function name
+    class Handlers:
+        def __init__(self):
+            """ Create a new point at the origin """
+            self.server = server
+        
+        def onDeleteWindow(self, *args):
+            Gtk.main_quit(*args)
+            print("Exiting...")
+               
+        def change_panel(self, widget, args=1):
+            widget_name = widget.get_name()
+            print(widget_name)
+            
+            if widget_name == "tip_enable":
+                panel = self.server.tip_main_box  
+                
+                tip_amount = 0
+                tip_amount = locale.format_string('%.2f', tip_amount)
+                server.tip_amount_label.set_text(tip_amount)
+                    
+            elif widget_name == "admin_enable":
+                panel = self.server.admin_main_box
+                                
+                try:
+                    host_ip = get_host_ip()
+                    dns_name = get_domain_name(host_ip)
+                    server.ip_address_info.set_text("https://" + dns_name + "  or  https://" + host_ip)
+                except Exception as e:
+                    print(e)
+                    dns_name = ""
+                    pass
+                    
+            elif widget_name == "start_enable":
+                panel = self.server.start_main_box
+                      
+            rh.remove_child_widget(self.server)
+            self.server.window1.add(panel)
+            self.server.window1.show_all()        
+
+        def cancel_payment(self, widget, args):
+            print('cancel')
+            panel = self.server.start_main_box
+            rh.remove_child_widget(self.server)
+            self.server.window1.add(panel)
+            self.server.window1.show_all()    
+
+        def on_admin_pad_button_release_event(self, widget):
+        # print(widget.get_label())
+            print("Handled")
+            pin_entry = self.server.pin_entry_obj.get_label()
+
+            if len(pin_entry) >= 4:
+                pin_entry = ''
+
+            button_label = widget.get_label()
+
+            if button_label == "gtk-go-back":
+                print("back")
+                admin_panel_disable(self.server)
+                return
+
+            pin_entry += button_label
+            # print(pin_entry)
+
+            if pin_entry == secret_code:
+                Gtk.main_quit()
+
+            self.server.pin_entry_obj.set_label(pin_entry)
+
+        def on_tip_pad_button_release_event(self, widget):
+
+            if len(self.server.tip_digits) >= 6:
+                return
+
+            tip_digit = widget.get_label()
+            # print(tip_digit)
+
+            self.server.tip_digits += tip_digit
+            # print(self.server.tip_digits)
+
+            tip_amount = int(self.server.tip_digits) / 100
+            # print(tip_amount)
+
+            config_data = m2_util.get_config_data()
+            locale_setting = config_data["globals"]["locale_setting"]
+            locale.setlocale(locale.LC_ALL, locale_setting)
+
+            tip_amount = locale.format_string('%.2f', tip_amount, grouping=True)
+            self.server.tip_amount_label.set_text(tip_amount)
+
+
+        def on_tip_pad_ok_release_event(self, widget):
+            print("Tip amount = " + self.server.tip_digits)
+            tip_amount = int(self.server.tip_digits) / 100
+
+            config_data = m2_util.get_config_data()
+
+            network_type = config_data["cardano"]["network_type"]
+
+            wallet_address = config_data["cardano"]['networks'][network_type]["wallet_address"]
+
+            randomID = random.randint(0, 9999)
+
+            now = datetime.now()
+            d1 = now.strftime("%y%m%d-%H%M")
+
+            transaction_id = d1 + "-" + str(randomID)
+            print(transaction_id)
+
+            json_data = {
+                "network_type": network_type,
+                "transaction_id": transaction_id,
+                "wallet_address": wallet_address,
+                "token_policyID": "ada",
+                "token_name": "ada",
+                "amount": tip_amount}
+
+            pprint(json_data)
+            print()
+
+            rh.payment_request_simple(self.server, json_data)
+
+        def on_tip_clear_button_release_event(self, widget):
+            self.server.tip_digits = ''
+
+            config_data = m2_util.get_config_data()
+            locale_setting = config_data["globals"]["locale_setting"]
+            locale.setlocale(locale.LC_ALL, locale_setting)
+
+            tip_amount = 0
+            tip_amount = locale.format_string('%.2f', tip_amount)
+            self.server.tip_amount_label.set_text(tip_amount)
+            
 
     # Setup gtk builder
     builder = Gtk.Builder()
     builder.add_from_file(ROOT_DIR + "/paypad.glade")
-    server.builder_env = builder
+    #server.builder_env = builder
+    builder.connect_signals(Handlers())
 
     # Connect start panel to server object
     server.start_main_box = builder.get_object("start_main_box")
-    server.tip_button = builder.get_object("tip_button")
-    server.tip_button.connect("button-release-event", tip_panel_enable, server)
     server.vendor_image = builder.get_object("vendor_image")
-    set_payment_image(server.vendor_image)
-
-    server.vendor_image_event = builder.get_object("vendor_image_event")
-    server.vendor_image_event.connect(
-        "button-release-event", admin_panel_enable, server)
+    m2_util.set_payment_image(server.vendor_image)
 
     # Connect payment panel to server object
     server.payment_main_box = builder.get_object("payment_main_box")
@@ -263,86 +251,24 @@ if __name__ == "__main__":
     server.payment_label = builder.get_object("amount_label")
 
     server.payment_image_event = builder.get_object("payment_image_event")
-    set_payment_image(server.payment_image)
-    server.payment_image_event.connect(
-        "button-release-event", admin_panel_enable, server)
+    m2_util.set_payment_image(server.payment_image)
 
     # Connect admin panel to server object
     server.admin_main_box = builder.get_object("admin_main_box")
     window2 = builder.get_object("window2")
     window2.remove(server.admin_main_box)
 
-    server.admin_pad_0 = builder.get_object("pin_0")
-    server.admin_pad_1 = builder.get_object("pin_1")
-    server.admin_pad_2 = builder.get_object("pin_2")
-    server.admin_pad_3 = builder.get_object("pin_3")
-    server.admin_pad_4 = builder.get_object("pin_4")
-    server.admin_pad_5 = builder.get_object("pin_5")
-    server.admin_pad_6 = builder.get_object("pin_6")
-    server.admin_pad_7 = builder.get_object("pin_7")
-    server.admin_pad_8 = builder.get_object("pin_8")
-    server.admin_pad_9 = builder.get_object("pin_9")
-    server.admin_pad_back = builder.get_object("pin_back")
     server.pin_entry_obj = builder.get_object("pin_label")
     server.ip_address_info = builder.get_object("ip_address_info")
-
-    server.admin_pad_0.connect("button-release-event", on_admin_pad_button_press_event, server)
-    server.admin_pad_1.connect("button-release-event", on_admin_pad_button_press_event, server)
-    server.admin_pad_2.connect("button-release-event", on_admin_pad_button_press_event, server)
-    server.admin_pad_3.connect("button-release-event", on_admin_pad_button_press_event, server)
-    server.admin_pad_4.connect("button-release-event", on_admin_pad_button_press_event, server)
-    server.admin_pad_5.connect("button-release-event", on_admin_pad_button_press_event, server)
-    server.admin_pad_6.connect("button-release-event", on_admin_pad_button_press_event, server)
-    server.admin_pad_7.connect("button-release-event", on_admin_pad_button_press_event, server)
-    server.admin_pad_8.connect("button-release-event", on_admin_pad_button_press_event, server)
-    server.admin_pad_9.connect("button-release-event", on_admin_pad_button_press_event, server)
-    server.admin_pad_back.connect("button-release-event", on_admin_pad_button_press_event, server)
 
     # Connect tip panel to server object
     server.tip_main_box = builder.get_object("tip_main_box")
     window4 = builder.get_object("window4")
     window4.remove(server.tip_main_box)
 
-    server.tip_pad_0 = builder.get_object("tippin_0")
-    server.tip_pad_1 = builder.get_object("tippin_1")
-    server.tip_pad_2 = builder.get_object("tippin_2")
-    server.tip_pad_3 = builder.get_object("tippin_3")
-    server.tip_pad_4 = builder.get_object("tippin_4")
-    server.tip_pad_5 = builder.get_object("tippin_5")
-    server.tip_pad_6 = builder.get_object("tippin_6")
-    server.tip_pad_7 = builder.get_object("tippin_7")
-    server.tip_pad_8 = builder.get_object("tippin_8")
-    server.tip_pad_9 = builder.get_object("tippin_9")
-    server.tip_pad_ok = builder.get_object("tippin_ok")
-
-    server.tip_pad_0.connect("button-release-event", on_tip_pad_button_press_event, server)
-    server.tip_pad_1.connect("button-release-event", on_tip_pad_button_press_event, server)
-    server.tip_pad_2.connect("button-release-event", on_tip_pad_button_press_event, server)
-    server.tip_pad_3.connect("button-release-event", on_tip_pad_button_press_event, server)
-    server.tip_pad_4.connect("button-release-event", on_tip_pad_button_press_event, server)
-    server.tip_pad_5.connect("button-release-event", on_tip_pad_button_press_event, server)
-    server.tip_pad_6.connect("button-release-event", on_tip_pad_button_press_event, server)
-    server.tip_pad_7.connect("button-release-event", on_tip_pad_button_press_event, server)
-    server.tip_pad_8.connect("button-release-event", on_tip_pad_button_press_event, server)
-    server.tip_pad_9.connect("button-release-event", on_tip_pad_button_press_event, server)
-
-    server.tip_pad_ok.connect(
-        "button-release-event",
-        on_tip_pad_ok_press_event,
-        server)
-
     server.tip_digits = ''
     server.tip_amount_label = builder.get_object("tip_amount_label")
 
-    server.tip_goback_button = builder.get_object("tip_goback_button")
-    server.tip_goback_button.connect(
-        "button-release-event", tip_panel_disable, server)
-
-    server.tip_clear_button = builder.get_object("tip_clear_button")
-    server.tip_clear_button.connect(
-        "button-release-event",
-        on_tip_clear_button_press_event,
-        server)
 
     # Setup main window
     headerbar = Gtk.HeaderBar()
@@ -352,15 +278,14 @@ if __name__ == "__main__":
     server.window1 = builder.get_object("window1")
     server.window1.set_titlebar(headerbar)
     server.window1.show_all()
-    # server.payment_box.hide()   
-    
-
+ 
     # if platform.machine() == 'aarch64':
+    # Do not go fulllscreen on developement box
     if platform.machine() != 'x86_64':
         fullscreen_at_monitor(server.window1, 0)
 
-    server.window1.connect('destroy', Gtk.main_quit)
-
+    GLib.unix_signal_add(GLib.PRIORITY_DEFAULT, signal.SIGINT, Gtk.main_quit)
+ 
     Gtk.main()
 
     print("Exiting...")

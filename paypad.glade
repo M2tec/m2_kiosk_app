@@ -1,28 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.38.2 -->
+<!-- Generated with glade 3.40.0 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
   <object class="GtkWindow" id="window1">
     <property name="name">M2 Paypad</property>
-    <property name="width-request">700</property>
-    <property name="height-request">400</property>
+    <property name="width-request">476</property>
+    <property name="height-request">800</property>
     <property name="can-focus">False</property>
     <property name="hide-titlebar-when-maximized">True</property>
+    <signal name="destroy" handler="onDeleteWindow" swapped="no"/>
     <child>
       <object class="GtkBox" id="start_main_box">
         <property name="name">start_main_box</property>
         <property name="can-focus">False</property>
-        <property name="margin-start">15</property>
-        <property name="margin-end">15</property>
-        <property name="margin-top">15</property>
-        <property name="margin-bottom">15</property>
         <property name="hexpand">False</property>
+        <property name="orientation">vertical</property>
         <child>
-          <object class="GtkButton" id="tip_button">
+          <object class="GtkEventBox" id="vendor_image_event">
+            <property name="name">admin_enable</property>
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <signal name="button-release-event" handler="change_panel" swapped="no"/>
+            <child>
+              <object class="GtkImage" id="vendor_image">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="pixbuf">static/m2tec_logo.jpg</property>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="tip_enable">
+            <property name="name">tip_enable</property>
             <property name="visible">True</property>
             <property name="can-focus">True</property>
             <property name="receives-default">True</property>
-            <property name="margin-end">15</property>
+            <property name="margin-start">5</property>
+            <property name="margin-end">5</property>
+            <property name="margin-top">5</property>
+            <property name="margin-bottom">5</property>
+            <signal name="released" handler="change_panel" swapped="no"/>
             <child>
               <object class="GtkLabel">
                 <property name="visible">True</property>
@@ -37,25 +60,6 @@
           <packing>
             <property name="expand">True</property>
             <property name="fill">True</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkEventBox" id="vendor_image_event">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-            <child>
-              <object class="GtkImage" id="vendor_image">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="pixbuf">static/m2tec_logo.jpg</property>
-              </object>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">False</property>
-            <property name="padding">15</property>
             <property name="pack-type">end</property>
             <property name="position">1</property>
           </packing>
@@ -64,55 +68,44 @@
     </child>
   </object>
   <object class="GtkWindow" id="window2">
-    <property name="width-request">700</property>
-    <property name="height-request">400</property>
+    <property name="width-request">480</property>
+    <property name="height-request">800</property>
     <property name="can-focus">False</property>
     <child>
       <object class="GtkBox" id="admin_main_box">
         <property name="name">admin_main_box</property>
         <property name="visible">True</property>
         <property name="can-focus">False</property>
-        <property name="margin-start">15</property>
-        <property name="margin-end">15</property>
-        <property name="margin-top">15</property>
-        <property name="margin-bottom">15</property>
         <property name="orientation">vertical</property>
         <child>
           <!-- n-columns=3 n-rows=4 -->
           <object class="GtkGrid" id="admin_grid_box">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
-            <property name="margin-left">140</property>
-            <property name="margin-right">140</property>
-            <property name="margin-start">130</property>
-            <property name="margin-end">130</property>
-            <property name="margin-top">30</property>
-            <property name="margin-bottom">15</property>
+            <property name="margin-start">5</property>
+            <property name="margin-end">5</property>
+            <property name="margin-top">5</property>
+            <property name="margin-bottom">5</property>
             <property name="hexpand">True</property>
             <property name="vexpand">True</property>
             <child>
-              <object class="GtkButton" id="pin_7">
-                <property name="label" translatable="yes">7</property>
-                <property name="width-request">-1</property>
-                <property name="visible">True</property>
-                <property name="can-focus">True</property>
-                <property name="receives-default">True</property>
-                <property name="hexpand">True</property>
-                <property name="vexpand">True</property>
-              </object>
-              <packing>
-                <property name="left-attach">0</property>
-                <property name="top-attach">0</property>
-              </packing>
-            </child>
-            <child>
               <object class="GtkButton" id="pin_8">
-                <property name="label" translatable="yes">8</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
                 <property name="hexpand">True</property>
                 <property name="vexpand">True</property>
+                <signal name="released" handler="on_admin_pad_button_release_event" swapped="no"/>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label" translatable="yes">8</property>
+                    <attributes>
+                      <attribute name="font-desc" value="Sans Bold 21"/>
+                    </attributes>
+                  </object>
+                </child>
               </object>
               <packing>
                 <property name="left-attach">1</property>
@@ -121,12 +114,22 @@
             </child>
             <child>
               <object class="GtkButton" id="pin_4">
-                <property name="label" translatable="yes">4</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
                 <property name="hexpand">True</property>
                 <property name="vexpand">True</property>
+                <signal name="released" handler="on_admin_pad_button_release_event" swapped="no"/>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label" translatable="yes">4</property>
+                    <attributes>
+                      <attribute name="font-desc" value="Sans Bold 21"/>
+                    </attributes>
+                  </object>
+                </child>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -135,12 +138,22 @@
             </child>
             <child>
               <object class="GtkButton" id="pin_5">
-                <property name="label" translatable="yes">5</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
                 <property name="hexpand">True</property>
                 <property name="vexpand">True</property>
+                <signal name="released" handler="on_admin_pad_button_release_event" swapped="no"/>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label" translatable="yes">5</property>
+                    <attributes>
+                      <attribute name="font-desc" value="Sans Bold 21"/>
+                    </attributes>
+                  </object>
+                </child>
               </object>
               <packing>
                 <property name="left-attach">1</property>
@@ -149,12 +162,22 @@
             </child>
             <child>
               <object class="GtkButton" id="pin_6">
-                <property name="label" translatable="yes">6</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
                 <property name="hexpand">True</property>
                 <property name="vexpand">True</property>
+                <signal name="released" handler="on_admin_pad_button_release_event" swapped="no"/>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label" translatable="yes">6</property>
+                    <attributes>
+                      <attribute name="font-desc" value="Sans Bold 21"/>
+                    </attributes>
+                  </object>
+                </child>
               </object>
               <packing>
                 <property name="left-attach">2</property>
@@ -163,12 +186,22 @@
             </child>
             <child>
               <object class="GtkButton" id="pin_9">
-                <property name="label" translatable="yes">9</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
                 <property name="hexpand">True</property>
                 <property name="vexpand">True</property>
+                <signal name="released" handler="on_admin_pad_button_release_event" swapped="no"/>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label" translatable="yes">9</property>
+                    <attributes>
+                      <attribute name="font-desc" value="Sans Bold 21"/>
+                    </attributes>
+                  </object>
+                </child>
               </object>
               <packing>
                 <property name="left-attach">2</property>
@@ -177,12 +210,22 @@
             </child>
             <child>
               <object class="GtkButton" id="pin_2">
-                <property name="label" translatable="yes">2</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
                 <property name="hexpand">True</property>
                 <property name="vexpand">True</property>
+                <signal name="released" handler="on_admin_pad_button_release_event" swapped="no"/>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label" translatable="yes">2</property>
+                    <attributes>
+                      <attribute name="font-desc" value="Sans Bold 21"/>
+                    </attributes>
+                  </object>
+                </child>
               </object>
               <packing>
                 <property name="left-attach">1</property>
@@ -191,12 +234,22 @@
             </child>
             <child>
               <object class="GtkButton" id="pin_1">
-                <property name="label" translatable="yes">1</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
                 <property name="hexpand">True</property>
                 <property name="vexpand">True</property>
+                <signal name="released" handler="on_admin_pad_button_release_event" swapped="no"/>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label" translatable="yes">1</property>
+                    <attributes>
+                      <attribute name="font-desc" value="Sans Bold 21"/>
+                    </attributes>
+                  </object>
+                </child>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -205,12 +258,22 @@
             </child>
             <child>
               <object class="GtkButton" id="pin_3">
-                <property name="label" translatable="yes">3</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
                 <property name="hexpand">True</property>
                 <property name="vexpand">True</property>
+                <signal name="released" handler="on_admin_pad_button_release_event" swapped="no"/>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label" translatable="yes">3</property>
+                    <attributes>
+                      <attribute name="font-desc" value="Sans Bold 21"/>
+                    </attributes>
+                  </object>
+                </child>
               </object>
               <packing>
                 <property name="left-attach">2</property>
@@ -229,12 +292,22 @@
             </child>
             <child>
               <object class="GtkButton" id="pin_0">
-                <property name="label" translatable="yes">0</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
                 <property name="hexpand">True</property>
                 <property name="vexpand">True</property>
+                <signal name="released" handler="on_admin_pad_button_release_event" swapped="no"/>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label" translatable="yes">0</property>
+                    <attributes>
+                      <attribute name="font-desc" value="Sans Bold 21"/>
+                    </attributes>
+                  </object>
+                </child>
               </object>
               <packing>
                 <property name="left-attach">1</property>
@@ -243,18 +316,50 @@
             </child>
             <child>
               <object class="GtkButton" id="pin_back">
-                <property name="label">gtk-go-back</property>
+                <property name="name">start_enable</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
                 <property name="hexpand">True</property>
                 <property name="vexpand">True</property>
-                <property name="use-stock">True</property>
                 <property name="always-show-image">True</property>
+                <signal name="released" handler="change_panel" swapped="no"/>
+                <child>
+                  <object class="GtkImage">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="pixbuf">static/back_icon.svg</property>
+                  </object>
+                </child>
               </object>
               <packing>
                 <property name="left-attach">2</property>
                 <property name="top-attach">3</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="pin_7">
+                <property name="width-request">-1</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <property name="hexpand">True</property>
+                <property name="vexpand">True</property>
+                <signal name="released" handler="on_admin_pad_button_release_event" swapped="no"/>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label" translatable="yes">7</property>
+                    <attributes>
+                      <attribute name="font-desc" value="Sans Bold 21"/>
+                    </attributes>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="left-attach">0</property>
+                <property name="top-attach">0</property>
               </packing>
             </child>
           </object>
@@ -304,73 +409,23 @@
   </object>
   <object class="GtkWindow" id="window3">
     <property name="name">M2 Paypad</property>
-    <property name="width-request">700</property>
-    <property name="height-request">400</property>
+    <property name="width-request">476</property>
+    <property name="height-request">800</property>
     <property name="can-focus">False</property>
     <property name="hide-titlebar-when-maximized">True</property>
     <child>
       <object class="GtkBox" id="payment_main_box">
         <property name="name">payment_main_box</property>
         <property name="can-focus">False</property>
-        <property name="margin-start">15</property>
-        <property name="margin-end">15</property>
-        <property name="margin-top">15</property>
-        <property name="margin-bottom">15</property>
         <property name="hexpand">False</property>
+        <property name="orientation">vertical</property>
         <child>
           <object class="GtkBox" id="payment_box">
             <property name="can-focus">False</property>
+            <property name="margin-start">5</property>
+            <property name="margin-end">5</property>
+            <property name="margin-bottom">5</property>
             <property name="orientation">vertical</property>
-            <child>
-              <object class="GtkLabel">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="double-buffered">False</property>
-                <property name="halign">start</property>
-                <property name="hexpand">False</property>
-                <property name="label" translatable="yes">Complete Payment</property>
-                <attributes>
-                  <attribute name="font-desc" value="Sans Bold 21"/>
-                </attributes>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="halign">start</property>
-                <property name="margin-top">15</property>
-                <property name="hexpand">True</property>
-                <property name="label" translatable="yes">Use the gamechanger app 
-to scan the qr-code</property>
-                <attributes>
-                  <attribute name="font-desc" value="Sans 14"/>
-                </attributes>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="double-buffered">False</property>
-                <property name="vexpand">True</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">2</property>
-              </packing>
-            </child>
             <child>
               <object class="GtkLabel" id="token_name">
                 <property name="visible">True</property>
@@ -385,7 +440,7 @@ to scan the qr-code</property>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">3</property>
+                <property name="position">0</property>
               </packing>
             </child>
             <child>
@@ -447,6 +502,7 @@ to scan the qr-code</property>
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
+            <property name="pack-type">end</property>
             <property name="position">0</property>
           </packing>
         </child>
@@ -454,6 +510,7 @@ to scan the qr-code</property>
           <object class="GtkEventBox" id="payment_image_event">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
+            <signal name="button-release-event" handler="cancel_payment" swapped="no"/>
             <child>
               <object class="GtkImage" id="payment_image">
                 <property name="visible">True</property>
@@ -465,8 +522,6 @@ to scan the qr-code</property>
           <packing>
             <property name="expand">False</property>
             <property name="fill">False</property>
-            <property name="padding">15</property>
-            <property name="pack-type">end</property>
             <property name="position">2</property>
           </packing>
         </child>
@@ -474,81 +529,30 @@ to scan the qr-code</property>
     </child>
   </object>
   <object class="GtkWindow" id="window4">
-    <property name="width-request">700</property>
-    <property name="height-request">400</property>
+    <property name="width-request">480</property>
+    <property name="height-request">800</property>
     <property name="can-focus">False</property>
     <child>
       <object class="GtkBox" id="tip_main_box">
         <property name="name">tip_main_box</property>
         <property name="can-focus">False</property>
-        <property name="margin-start">15</property>
-        <property name="margin-end">15</property>
-        <property name="margin-top">15</property>
-        <property name="margin-bottom">15</property>
         <property name="hexpand">False</property>
+        <property name="orientation">vertical</property>
         <child>
           <object class="GtkBox" id="tip_text_box">
             <property name="can-focus">False</property>
+            <property name="margin-start">5</property>
+            <property name="margin-end">5</property>
+            <property name="margin-top">5</property>
+            <property name="margin-bottom">5</property>
             <property name="orientation">vertical</property>
             <child>
               <object class="GtkLabel">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="double-buffered">False</property>
                 <property name="halign">start</property>
-                <property name="hexpand">False</property>
+                <property name="hexpand">True</property>
                 <property name="label" translatable="yes">Tip amount</property>
-                <attributes>
-                  <attribute name="font-desc" value="Sans Bold 21"/>
-                </attributes>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="halign">start</property>
-                <property name="margin-top">15</property>
-                <property name="hexpand">True</property>
-                <property name="label" translatable="yes">You can provide a tip of your
-choosing. Enter the amount
-on the right and press OK. 
-Minimum amount is 1 ADA.</property>
-                <attributes>
-                  <attribute name="font-desc" value="Sans 14"/>
-                </attributes>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel" id="label2">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="double-buffered">False</property>
-                <property name="vexpand">True</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">2</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="halign">start</property>
-                <property name="hexpand">True</property>
-                <property name="label" translatable="yes">Amount</property>
                 <attributes>
                   <attribute name="font-desc" value="Sans Bold 23"/>
                 </attributes>
@@ -620,6 +624,7 @@ Minimum amount is 1 ADA.</property>
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
+            <property name="pack-type">end</property>
             <property name="position">0</property>
           </packing>
         </child>
@@ -641,6 +646,7 @@ Minimum amount is 1 ADA.</property>
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="receives-default">True</property>
+                    <signal name="released" handler="on_tip_clear_button_release_event" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -651,9 +657,11 @@ Minimum amount is 1 ADA.</property>
                 <child>
                   <object class="GtkButton" id="tip_goback_button">
                     <property name="label" translatable="yes">Go back</property>
+                    <property name="name">start_enable</property>
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="receives-default">True</property>
+                    <signal name="released" handler="change_panel" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -690,6 +698,7 @@ Minimum amount is 1 ADA.</property>
                     <property name="receives-default">True</property>
                     <property name="hexpand">True</property>
                     <property name="vexpand">True</property>
+                    <signal name="released" handler="on_tip_pad_button_release_event" swapped="no"/>
                   </object>
                   <packing>
                     <property name="left-attach">0</property>
@@ -704,6 +713,7 @@ Minimum amount is 1 ADA.</property>
                     <property name="receives-default">True</property>
                     <property name="hexpand">True</property>
                     <property name="vexpand">True</property>
+                    <signal name="released" handler="on_tip_pad_button_release_event" swapped="no"/>
                   </object>
                   <packing>
                     <property name="left-attach">1</property>
@@ -718,6 +728,7 @@ Minimum amount is 1 ADA.</property>
                     <property name="receives-default">True</property>
                     <property name="hexpand">True</property>
                     <property name="vexpand">True</property>
+                    <signal name="released" handler="on_tip_pad_button_release_event" swapped="no"/>
                   </object>
                   <packing>
                     <property name="left-attach">0</property>
@@ -732,6 +743,7 @@ Minimum amount is 1 ADA.</property>
                     <property name="receives-default">True</property>
                     <property name="hexpand">True</property>
                     <property name="vexpand">True</property>
+                    <signal name="released" handler="on_tip_pad_button_release_event" swapped="no"/>
                   </object>
                   <packing>
                     <property name="left-attach">1</property>
@@ -746,6 +758,7 @@ Minimum amount is 1 ADA.</property>
                     <property name="receives-default">True</property>
                     <property name="hexpand">True</property>
                     <property name="vexpand">True</property>
+                    <signal name="released" handler="on_tip_pad_button_release_event" swapped="no"/>
                   </object>
                   <packing>
                     <property name="left-attach">2</property>
@@ -760,6 +773,7 @@ Minimum amount is 1 ADA.</property>
                     <property name="receives-default">True</property>
                     <property name="hexpand">True</property>
                     <property name="vexpand">True</property>
+                    <signal name="released" handler="on_tip_pad_button_release_event" swapped="no"/>
                   </object>
                   <packing>
                     <property name="left-attach">2</property>
@@ -774,6 +788,7 @@ Minimum amount is 1 ADA.</property>
                     <property name="receives-default">True</property>
                     <property name="hexpand">True</property>
                     <property name="vexpand">True</property>
+                    <signal name="released" handler="on_tip_pad_button_release_event" swapped="no"/>
                   </object>
                   <packing>
                     <property name="left-attach">1</property>
@@ -788,6 +803,7 @@ Minimum amount is 1 ADA.</property>
                     <property name="receives-default">True</property>
                     <property name="hexpand">True</property>
                     <property name="vexpand">True</property>
+                    <signal name="released" handler="on_tip_pad_button_release_event" swapped="no"/>
                   </object>
                   <packing>
                     <property name="left-attach">0</property>
@@ -802,6 +818,7 @@ Minimum amount is 1 ADA.</property>
                     <property name="receives-default">True</property>
                     <property name="hexpand">True</property>
                     <property name="vexpand">True</property>
+                    <signal name="released" handler="on_tip_pad_button_release_event" swapped="no"/>
                   </object>
                   <packing>
                     <property name="left-attach">2</property>
@@ -816,6 +833,7 @@ Minimum amount is 1 ADA.</property>
                     <property name="receives-default">True</property>
                     <property name="hexpand">True</property>
                     <property name="vexpand">True</property>
+                    <signal name="released" handler="on_tip_pad_button_release_event" swapped="no"/>
                   </object>
                   <packing>
                     <property name="left-attach">1</property>
@@ -833,6 +851,7 @@ Minimum amount is 1 ADA.</property>
                     <property name="vexpand">True</property>
                     <property name="use-stock">True</property>
                     <property name="always-show-image">True</property>
+                    <signal name="released" handler="on_tip_pad_ok_release_event" swapped="no"/>
                   </object>
                   <packing>
                     <property name="left-attach">2</property>
@@ -858,7 +877,7 @@ Minimum amount is 1 ADA.</property>
             </child>
           </object>
           <packing>
-            <property name="expand">False</property>
+            <property name="expand">True</property>
             <property name="fill">True</property>
             <property name="position">1</property>
           </packing>
