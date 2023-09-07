@@ -149,7 +149,7 @@ if __name__ == "__main__":
             if len(pin_entry) >= 4:
                 pin_entry = ''
 
-            button_label = widget.get_label()
+            button_label = widget.get_child().get_label()
 
             if button_label == "gtk-go-back":
                 print("back")
