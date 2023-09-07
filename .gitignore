@@ -1,5 +1,6 @@
 /src
 /venv
+/gamechanger-scripts
 mnemonic.txt
 /node_modules
 package-lock.json

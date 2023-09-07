@@ -30,6 +30,8 @@ import json
 import brotli
 import base64
 
+# import nft_storage
+
 def base64_encode(string):
     """
     Removes any `=` used as padding from the encoded string.
@@ -186,6 +188,154 @@ def cardano_transaction_json_gcfs(json_dict):
 
     return transaction_dict
 
+def cardano_mint_json_v2(json_dict):
+
+    transaction_dict = {
+        "type": "script",
+        "title": "Minting",
+        "description": "Mint your loyaly token",
+        "exportAs": "MintingDemo",
+        "return": {
+            "mode": "last"
+        },
+        "run": {
+            "dependencies": {
+                "type": "script",
+                "run": {
+                    "address": {
+                        "type": "getCurrentAddress"
+                    },
+                    "addressInfo": {
+                        "type": "macro",
+                        "run": "{getAddressInfo(get('cache.dependencies.address'))}"
+                    },
+                    "assetName": {
+                        "type": "data",
+                        "value": json_dict["token_name"]
+                    },
+                    "quantity": {
+                        "type": "data",
+                        "value": json_dict["amount"]
+                    },
+                    "currentSlotNumber": {
+                        "type": "getCurrentSlot"
+                    },
+                    "deadlineSlotNumber": {
+                        "type": "macro",
+                        "run": "{addBigNum(get('cache.dependencies.currentSlotNumber'),'86400')}"
+                    },
+                    "mintingPolicy": {
+                        "type": "nativeScript",
+                        "script": {
+                            "all": {
+                                "issuer": {
+                                    "pubKeyHashHex": "{get('cache.dependencies.addressInfo.paymentKeyHash')}"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "build": {
+                "type": "buildTx",
+                "name": "build-Mint-Fungible",
+                "title": "Mint fungible token",
+                "tx": {
+                    "ttl": {
+                        "until": "{get('cache.dependencies.deadlineSlotNumber')}"
+                    },
+                    "mints": [
+                        {
+                            "policyId": "{get('cache.dependencies.mintingPolicy.scriptHashHex')}",
+                            "assets": [
+                                {
+                                    "assetName": "{get('cache.dependencies.assetName')}",
+                                    "quantity": "{get('cache.dependencies.quantity')}"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": {
+                        "exampleDrop01": {
+                            "address": "{get('cache.dependencies.address')}",
+                            "assets": [
+                                {
+                                    "policyId": "ada",
+                                    "assetName": "ada",
+                                    "quantity": "2000000"
+                                },
+                                {
+                                    "policyId": "{get('cache.dependencies.mintingPolicy.scriptHashHex')}",
+                                    "assetName": "{get('cache.dependencies.assetName')}",
+                                    "quantity": "{get('cache.dependencies.quantity')}"
+                                }
+                            ]
+                        }
+                    },
+                    "witnesses": {
+                        "nativeScripts": {
+                            "mintingScript": "{get('cache.dependencies.mintingPolicy.scriptHex')}"
+                        }
+                    },
+                    "auxiliaryData": {
+                        "721": {
+                            "{get('cache.dependencies.mintingPolicy.scriptHashHex')}": {
+                                "{get('cache.dependencies.assetName')}": {
+                                    "name": "{get('cache.dependencies.assetName')}",
+                                    "image": json_dict["ipfs_cid"],
+                                    "version": "1.0",
+                                    "mediaType": "image/png"
+                                }
+                            }
+                        }
+                    }
+
+                }
+            },
+            "sign": {
+                "type": "signTxs",
+                "namePattern": "signed-Mint",
+                "detailedPermissions": false,
+                "txs": [
+                    "{get('cache.build.txHex')}"
+                ]
+            },
+            "submit": {
+                "type": "submitTxs",
+                "namePattern": "submitted-Mint",
+                "txs": "{get('cache.sign')}"
+            },
+            "finally": {
+                "type": "script",
+                "run": {
+                    "txHash": {
+                        "type": "macro",
+                        "run": "{get('cache.build.txHash')}"
+                    },
+                    "assetName": {
+                        "type": "macro",
+                        "run": "{get('cache.dependencies.assetName')}"
+                    },
+                    "policyId": {
+                        "type": "macro",
+                        "run": "{get('cache.dependencies.mintingPolicy.scriptHashHex')}"
+                    },
+                    "canMintUntilSlotNumber": {
+                        "type": "macro",
+                        "run": "{get('cache.dependencies.deadlineSlotNumber')}"
+                    },
+                    "mintingScript": {
+                        "type": "macro",
+                        "run": "{get('cache.dependencies.mintingPolicy.scriptHex')}"
+                    }
+                }
+            }
+        }
+    }
+
+
+    return transaction_dict
+
 
 def qr_code(json_dict):
     print('-------- qr_code ----------')
@@ -240,6 +390,25 @@ def qr_code(json_dict):
     return image
 
 
+def url_mint_code(json_dict):
+    print('-------- qr_code ----------')
+    print(json_dict)      
+    network_type = json_dict["network_type"]
+    logo_data = json_dict("logo_data")
 
-  
+    # ipfs_cid = nft_storage.nft_storage_upload(logo_data)
+
+    # json_dict["ipfs_cid"] = ipfs_cid
+
+    if network_type == "Beta":
+        tx_json = cardano_mint_json_v2(json_dict)
+        gcscript = gc_encode_lzma(tx_json)
+        url = "https://beta-preprod-wallet.gamechanger.finance/api/2/run/" + gcscript
+
+    print("\n" + url)
+    
+    #with open('qr.svg', 'w') as f:
+    #    f.write(img.to_string().decode())
+
+    return url
     

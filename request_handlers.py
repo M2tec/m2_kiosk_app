@@ -259,5 +259,29 @@ def load_configuration_request(server, message, path, query, client_context, dat
     message.set_response('text/plain', Soup.MemoryUse.COPY, config_data.encode('utf-8'))
     # Send answer to paypad
     
+
+# Mint tokens
+def mint_token_request(server, message, path, query, client_context, data):
+    print('-------- Mint token request ----------')
+    pretty_print_json(message.request_body.data)
+    print()
     
+    try:
+        json_dict = json.loads(message.request_body.data)
+    except json.decoder.JSONDecodeError:
+        print('json.decoder.JSONDecodeError')
+        return
+        
+    mint_url = gamechanger.url_mint_code(json_dict)
+
+     # HTTP Response
+    cors_local_url = check_cors_origin(message)
+    message.response_headers.append("Access-Control-Allow-Origin", cors_local_url)
+    print("Cors local url: \t" + cors_local_url)
+
+    config_data = json.dumps(get_config())
+    #print(type(config_data))
+    message.set_status_full(200, config_data)
+    message.set_response('text/plain', Soup.MemoryUse.COPY, mint_url.encode('utf-8'))
+    # Send answer to paypad
     
