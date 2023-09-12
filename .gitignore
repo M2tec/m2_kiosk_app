@@ -11,3 +11,4 @@ __pycache__/
 .kiosk-session.swp
 /old
 /Documentation
+/.vscode

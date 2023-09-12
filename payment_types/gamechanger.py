@@ -1,21 +1,21 @@
 #!/usr/bin/python3
 
- # 
- # This file is part of the m2-kiosk-app distribution (https://github.com/M2tec/m2_kiosk_app).
- # Copyright (c) 2023 Maarten Menheere.
- # 
- # This program is free software: you can redistribute it and/or modify  
- # it under the terms of the GNU General Public License as published by  
- # the Free Software Foundation, version 3.
- #
- # This program is distributed in the hope that it will be useful, but 
- # WITHOUT ANY WARRANTY; without even the implied warranty of 
- # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
- # General Public License for more details.
- #
- # You should have received a copy of the GNU General Public License 
- # along with this program. If not, see <http://www.gnu.org/licenses/>.
- #
+#
+# This file is part of the m2-kiosk-app distribution (https://github.com/M2tec/m2_kiosk_app).
+# Copyright (c) 2023 Maarten Menheere.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 3.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
 import json
 import subprocess
@@ -31,6 +31,7 @@ import brotli
 import base64
 
 # import nft_storage
+
 
 def base64_encode(string):
     """
@@ -48,16 +49,19 @@ def base64_decode(string):
     string = string + (b"=" * padding)
     return base64.urlsafe_b64decode(string)
 
+
 def json_deindent(data):
-    #data = json.loads(data)
+    # data = json.loads(data)
     data = json.dumps(data, ensure_ascii=False, separators=(',', ':'))
     return data
+
 
 def gc_encode_brotli(gc_script):
     json_string = json_deindent(gc_script)
     brotli_data = brotli.compress(json_string.encode())
     url_string = base64_encode(brotli_data)
     return url_string.decode()
+
 
 def gc_decode_brotli(url_string):
     brotli_data = base64_decode(url_string.encode())
@@ -66,17 +70,22 @@ def gc_decode_brotli(url_string):
 
 
 def gc_encode_lzw(gc_script):
-    ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Root
-    p = subprocess.Popen(['node', ROOT_DIR + '/../json-url-reduced/json-url-lzw.js', json.dumps(gc_script)], stdout=subprocess.PIPE)
+    ROOT_DIR = os.path.dirname(os.path.abspath(
+        __file__))  # This is your Project Root
+    p = subprocess.Popen(['node', ROOT_DIR + '/../json-url-reduced/json-url-lzw.js',
+                         json.dumps(gc_script)], stdout=subprocess.PIPE)
     out = p.stdout.read().decode("utf-8").replace("\n", "")
-    #print("Result:" + repr(out))
+    # print("Result:" + repr(out))
     return out
 
+
 def gc_encode_lzma(gc_script):
-    ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Root
-    p = subprocess.Popen(['node', ROOT_DIR + '/../json-url-reduced/json-url-lzma.js', json.dumps(gc_script)], stdout=subprocess.PIPE)
+    ROOT_DIR = os.path.dirname(os.path.abspath(
+        __file__))  # This is your Project Root
+    p = subprocess.Popen(['node', ROOT_DIR + '/../json-url-reduced/json-url-lzma.js',
+                         json.dumps(gc_script)], stdout=subprocess.PIPE)
     out = p.stdout.read().decode("utf-8").replace("\n", "")
-    #print("Result:" + repr(out))
+    # print("Result:" + repr(out))
     return out
 
 
@@ -103,13 +112,14 @@ def cardano_transaction_json(json_dict):
     transaction_dict = {
         'type': 'tx',
         'title': transaction_id,
-        'description' : 'M2tec POS transaction',
+        'description': 'M2tec POS transaction',
         'outputs': outputs_dict,
     }
 
-    #print(json.dumps(transaction_dict, indent=4, sort_keys=True))
+    # print(json.dumps(transaction_dict, indent=4, sort_keys=True))
 
     return transaction_dict
+
 
 def cardano_transaction_json_v2(json_dict):
 
@@ -129,7 +139,7 @@ def cardano_transaction_json_v2(json_dict):
         'type': 'buildTx',
         'tx': {
             'outputs': [
-                { 
+                {
                     'address': wallet_address,
                     'assets': assets_list
                 }
@@ -137,29 +147,30 @@ def cardano_transaction_json_v2(json_dict):
         }
     }
 
-    sign_dict =         {
-            "type": "signTxs",
-            "detailedPermissions": False,
-            "txs": [
+    sign_dict = {
+        "type": "signTxs",
+        "detailedPermissions": False,
+        "txs": [
                 "{get('cache.0.txHex')}"
-            ]
-        }
+        ]
+    }
 
     submit_dict = {
-            "type": "submitTxs",
-            "txs": "{get('cache.1')}"
-        }
+        "type": "submitTxs",
+        "txs": "{get('cache.1')}"
+    }
 
     transaction_dict = {
         'type': 'script',
         'title': transaction_id,
-        'description' : 'M2tec POS transaction',
-        'run': [ outputs_dict, sign_dict, submit_dict ]    
+        'description': 'M2tec POS transaction',
+        'run': [outputs_dict, sign_dict, submit_dict]
     }
 
-    #print(json.dumps(transaction_dict, indent=4, sort_keys=True))
+    # print(json.dumps(transaction_dict, indent=4, sort_keys=True))
 
     return transaction_dict
+
 
 def cardano_transaction_json_gcfs(json_dict):
 
@@ -170,23 +181,24 @@ def cardano_transaction_json_gcfs(json_dict):
     transaction_dict = {
         "type": "script",
         "run": {
-        "A": {
-            "type": "importAsScript",
-            "args": {
-            "txId": transaction_id,
-            "ada": str(int(requested_amount)),
-            "wallet": wallet_address
-            },
-            "from": [
-            "gcfs://76897e6636ea9eefd37aaab82a8670394f84f2db29854bef8801552a.m2@latest://pay.gcscript"
-            ]
-        }
+            "A": {
+                "type": "importAsScript",
+                "args": {
+                    "txId": transaction_id,
+                    "ada": str(int(requested_amount)),
+                    "wallet": wallet_address
+                },
+                "from": [
+                    "gcfs://76897e6636ea9eefd37aaab82a8670394f84f2db29854bef8801552a.m2@latest://pay.gcscript"
+                ]
+            }
         }
     }
 
-    #print(json.dumps(transaction_dict, indent=4, sort_keys=True))
+    # print(json.dumps(transaction_dict, indent=4, sort_keys=True))
 
     return transaction_dict
+
 
 def cardano_mint_json_v2(json_dict):
 
@@ -211,7 +223,7 @@ def cardano_mint_json_v2(json_dict):
                     },
                     "assetName": {
                         "type": "data",
-                        "value": json_dict["token_name"]
+                        "value": json_dict["name"]
                     },
                     "quantity": {
                         "type": "data",
@@ -282,7 +294,7 @@ def cardano_mint_json_v2(json_dict):
                             "{get('cache.dependencies.mintingPolicy.scriptHashHex')}": {
                                 "{get('cache.dependencies.assetName')}": {
                                     "name": "{get('cache.dependencies.assetName')}",
-                                    "image": json_dict["ipfs_cid"],
+                                    "image": json_dict["logo_ipfs_cid"],
                                     "version": "1.0",
                                     "mediaType": "image/png"
                                 }
@@ -295,7 +307,7 @@ def cardano_mint_json_v2(json_dict):
             "sign": {
                 "type": "signTxs",
                 "namePattern": "signed-Mint",
-                "detailedPermissions": false,
+                "detailedPermissions": False,
                 "txs": [
                     "{get('cache.build.txHex')}"
                 ]
@@ -333,16 +345,15 @@ def cardano_mint_json_v2(json_dict):
         }
     }
 
-
     return transaction_dict
 
 
 def qr_code(json_dict):
     print('-------- qr_code ----------')
-    print(json_dict)      
+    print(json_dict)
     network_type = json_dict["network_type"]
     transaction_id = str(json_dict["transaction_id"])
-   
+
     if network_type == 'Mainnet':
         tx_json = cardano_transaction_json(json_dict)
         gcscript = gc_encode_lzw(tx_json)
@@ -361,7 +372,7 @@ def qr_code(json_dict):
     elif network_type == "Beta-gcfs":
         tx_json = cardano_transaction_json_gcfs(json_dict)
         gcscript = gc_encode_lzma(tx_json)
-        url = "https://beta-preprod-wallet.gamechanger.finance/api/2/run/" + gcscript      
+        url = "https://beta-preprod-wallet.gamechanger.finance/api/2/run/" + gcscript
 
     elif network_type == "Beta-brotli":
         tx_json = cardano_transaction_json_v2(json_dict)
@@ -381,34 +392,24 @@ def qr_code(json_dict):
     qr.add_data(url)
     qr.make()
     img = qr.make_image(back_color="white")
-    
-    #with open('qr.svg', 'w') as f:
+
+    # with open('qr.svg', 'w') as f:
     #    f.write(img.to_string().decode())
-    
+
     image = img.to_string()
-    #print(image)
+    # print(image)
     return image
 
 
-def url_mint_code(json_dict):
+def url_mint_code(network_type, json_dict):
     print('-------- qr_code ----------')
-    print(json_dict)      
-    network_type = json_dict["network_type"]
-    logo_data = json_dict("logo_data")
-
-    # ipfs_cid = nft_storage.nft_storage_upload(logo_data)
-
-    # json_dict["ipfs_cid"] = ipfs_cid
-
+    print(json_dict)
+    
     if network_type == "Beta":
         tx_json = cardano_mint_json_v2(json_dict)
         gcscript = gc_encode_lzma(tx_json)
         url = "https://beta-preprod-wallet.gamechanger.finance/api/2/run/" + gcscript
 
     print("\n" + url)
-    
-    #with open('qr.svg', 'w') as f:
-    #    f.write(img.to_string().decode())
 
     return url
-    

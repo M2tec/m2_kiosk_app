@@ -92,6 +92,8 @@ if __name__ == "__main__":
     server.add_handler("/clear-display", rh.clear_display_request, data)
     server.add_handler("/save-configuration", rh.save_configuration_request, data)   
     server.add_handler("/load-configuration", rh.load_configuration_request, data)   
+    server.add_handler("/save-logo", rh.save_logo_request, data) 
+    server.add_handler("/mint-token", rh.mint_token_request, data) 
 
     # Handlers are defined in the glade file in the widget properties -> signal tab
     # signal handler name should be the same ase the function name

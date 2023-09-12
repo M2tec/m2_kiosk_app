@@ -23,6 +23,9 @@ from pprint import pprint
 from m2_util import *
 from payment_types import *
 from payment_validators import *
+import base64
+import requests
+import io
 
 import gi
 gi.require_version('Gdk', '3.0')
@@ -30,10 +33,12 @@ gi.require_version("Gtk", "3.0")
 gi.require_version('Soup', '2.4')
 from gi.repository import Gio, GLib, Gdk, Gtk, GdkPixbuf, Soup  # NOQA
 
-def pretty_print_json(ugly_json):  
+
+def pretty_print_json(ugly_json):
     parsed_json = json.loads(ugly_json)
     pretty_json = json.dumps(parsed_json, indent=4)
     print(pretty_json)
+
 
 def remove_child_widget(server):
     child_widgets = server.window1.get_children()
@@ -41,16 +46,17 @@ def remove_child_widget(server):
         widget_type = type(w).__name__
         if widget_type == 'Box':
             child_widget = w
-               
+
     server.window1.remove(child_widget)
+
 
 if platform.machine() == 'x86_64':
     config_folder = HOME_DIR + "/.config/m2-kiosk/"
 else:
-#    config_folder = "/var/www/m2-kiosk-web/.config/"
+    #    config_folder = "/var/www/m2-kiosk-web/.config/"
     config_folder = HOME_DIR + "/.config/m2-kiosk/"
-    
-    
+
+
 config_file = "config.json"
 
 
@@ -77,7 +83,8 @@ def get_config():
 
         try:
             print("Reading config file")
-            f = open("/usr/local/share/m2-kiosk-app-hyper/m2_config_template.json", "r")
+            f = open(
+                "/usr/local/share/m2-kiosk-app-hyper/m2_config_template.json", "r")
             template_data = f.read()
             f.close()
             print(template_data)
@@ -126,7 +133,7 @@ def payment_request(server, message, path, query, client_context, data):
     print('-------- payment request ----------')
     pretty_print_json(message.request_body.data)
     print()
-    
+
     try:
         json_dict = json.loads(message.request_body.data)
     except json.decoder.JSONDecodeError:
@@ -138,20 +145,21 @@ def payment_request(server, message, path, query, client_context, data):
     # HTTP Response
     cors_local_url = check_cors_origin(message)
     # print("Cors_local_url: " + cors_local_url)
-    message.response_headers.append("Access-Control-Allow-Origin", cors_local_url)
+    message.response_headers.append(
+        "Access-Control-Allow-Origin", cors_local_url)
     message.set_status(200)
 
 
 def payment_request_simple(server, json_dict):
     print("payment_request_simple")
-    #print(json_dict)
+    # print(json_dict)
     remove_child_widget(server)
     server.window1.add(server.payment_main_box)
     server.window1.show_all()
 
     requested_amount = float(json_dict["amount"])
     token_name = json_dict["token_name"]
-    
+
     tx_file_name = gamechanger.qr_code(json_dict)
 
     # Set QR code image
@@ -161,9 +169,10 @@ def payment_request_simple(server, json_dict):
     locale_setting = config_data["globals"]["locale_setting"]
     locale.setlocale(locale.LC_ALL, locale_setting)
 
-    requested_amount = locale.format_string('%.2f', requested_amount, grouping=True)
+    requested_amount = locale.format_string(
+        '%.2f', requested_amount, grouping=True)
     server.token_name.set_text(token_name)
-    
+
     server.payment_label.set_text(requested_amount)
     server.window1.show_all()
 
@@ -200,11 +209,13 @@ def payment_status(server, message, path, query, client_context, data):
 
     cors_local_url = check_cors_origin(message)
 
-    message.response_headers.append("Access-Control-Allow-Origin", cors_local_url)
+    message.response_headers.append(
+        "Access-Control-Allow-Origin", cors_local_url)
     print("Cors local url: \t" + cors_local_url)
 
     message.set_status_full(200, payment_status)
-    message.set_response('text/plain', Soup.MemoryUse.COPY, payment_status.encode('utf-8'))
+    message.set_response('text/plain', Soup.MemoryUse.COPY,
+                         payment_status.encode('utf-8'))
 
 
 # Handle payment request to clear the window
@@ -213,16 +224,17 @@ def clear_display_request(server, message, path, query, client_context, data):
     remove_child_widget(server)
     server.window1.add(server.start_main_box)
     server.window1.show_all()
-       
+
     # HTTP Response
     cors_local_url = check_cors_origin(message)
-    message.response_headers.append("Access-Control-Allow-Origin", cors_local_url)
+    message.response_headers.append(
+        "Access-Control-Allow-Origin", cors_local_url)
     print("Cors local url: \t" + cors_local_url)
     # Send answer to paypad
 
     message.set_status(200)
-    
-    
+
+
 # Save configuration
 def save_configuration_request(server, message, path, query, client_context, data):
 
@@ -231,57 +243,117 @@ def save_configuration_request(server, message, path, query, client_context, dat
         pprint(config_data)
     except json.decoder.JSONDecodeError:
         print('json.decoder.JSONDecodeError')
-        return    
+        return
 
     with open(config_folder + config_file, 'w') as f:
         json.dump(config_data, f, ensure_ascii=False, indent=4)
 
     # HTTP Response
     cors_local_url = check_cors_origin(message)
-    message.response_headers.append("Access-Control-Allow-Origin", cors_local_url)
+    message.response_headers.append(
+        "Access-Control-Allow-Origin", cors_local_url)
     print("Cors local url: \t" + cors_local_url)
     # Send answer to paypad
 
-    message.set_status(200)  
-     
-     
+    message.set_status(200)
+
+
 # Load configuration
 def load_configuration_request(server, message, path, query, client_context, data):
 
-     # HTTP Response
+    # HTTP Response
     cors_local_url = check_cors_origin(message)
-    message.response_headers.append("Access-Control-Allow-Origin", cors_local_url)
+    message.response_headers.append(
+        "Access-Control-Allow-Origin", cors_local_url)
     print("Cors local url: \t" + cors_local_url)
 
     config_data = json.dumps(get_config())
-    #print(type(config_data))
+    # print(type(config_data))
     message.set_status_full(200, config_data)
-    message.set_response('text/plain', Soup.MemoryUse.COPY, config_data.encode('utf-8'))
+    message.set_response('text/plain', Soup.MemoryUse.COPY,
+                         config_data.encode('utf-8'))
     # Send answer to paypad
-    
+
+
+# Pin the logo to IPFS with NFT Storage API
+def save_logo_request(server, message, path, query, client_context, data):
+    print('-------- Save logo request ----------')
+
+    # message_string = message.request_body.data
+    print('\n======== message.request_body.data ===============')
+    message_string = message.request_body.data
+    print(repr(message_string))
+
+    print('\n======== message split ===============')
+    filedata = message_string.split("\"\r\n\r\n")[1].split("\r\n--")[0]
+    print(filedata)
+
+    bin = base64.b64decode(filedata.encode())
+    print("Logo bin type:" + str(type(bin)))
+
+    url = "https://api.nft.storage/upload"
+
+    headers = {'accept': 'application/json',
+               'Content-Type': 'image/*',
+               'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDlGZDNkYjM5NDJiZUYyNURhYWE4NzdkNTY4MDM0MTkyODI0MERkNGEiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTY5Mzk4NzU5MDU5MCwibmFtZSI6Ik0ydGVjIn0.X_zIKxYGZbaL32Jx1iC-hYtA8VYwNW5IuNUhT0Ld0-0'
+               }
+
+    r = requests.post(
+        url,
+        headers=headers,
+        data=bin)
+
+    print("Reason:".ljust(15) + str(r.reason))
+    print("Status code:".ljust(15) + str(r.status_code))
+    print("Text:".ljust(15) + str(r.text))
+
+    config_data = get_config()
+    ipfs_cid = json.loads(r.text)['value']['cid']
+    config_data['globals']['logo_ipfs_cid'] = ipfs_cid
+
+    with open(config_folder + config_file, 'w') as f:
+        json.dump(config_data, f, ensure_ascii=False, indent=4)
+
+     # HTTP Response
+    cors_local_url = check_cors_origin(message)
+    message.response_headers.append(
+        "Access-Control-Allow-Origin", cors_local_url)
+    print("Cors local url: \t" + cors_local_url)
+
+    # print(type(config_data))
+    message.set_status_full(200, r.text)
+
 
 # Mint tokens
 def mint_token_request(server, message, path, query, client_context, data):
     print('-------- Mint token request ----------')
-    pretty_print_json(message.request_body.data)
+    # pretty_print_json(message.request_body.data)
     print()
-    
-    try:
-        json_dict = json.loads(message.request_body.data)
-    except json.decoder.JSONDecodeError:
-        print('json.decoder.JSONDecodeError')
-        return
-        
-    mint_url = gamechanger.url_mint_code(json_dict)
 
-     # HTTP Response
+    # try:
+    #     json_dict = json.loads(message.request_body.data)
+    # except json.decoder.JSONDecodeError:
+    #     print('json.decoder.JSONDecodeError')
+    #     return
+
+    config_data = get_config()
+
+    network_type = config_data['cardano']['network_type']
+    
+    mint_data = {"logo_ipfs_cid": config_data['globals']['logo_ipfs_cid'],
+                 "name": config_data['cardano']['networks'][network_type]['loyalty_token']['name'],
+                 "amount": config_data['cardano']['networks'][network_type]['loyalty_token']['amount']
+                 }
+
+    mint_url = gamechanger.url_mint_code(network_type, mint_data)
+    # HTTP Response
+
     cors_local_url = check_cors_origin(message)
-    message.response_headers.append("Access-Control-Allow-Origin", cors_local_url)
+    message.response_headers.append(
+        "Access-Control-Allow-Origin", cors_local_url)
     print("Cors local url: \t" + cors_local_url)
 
-    config_data = json.dumps(get_config())
-    #print(type(config_data))
-    message.set_status_full(200, config_data)
-    message.set_response('text/plain', Soup.MemoryUse.COPY, mint_url.encode('utf-8'))
-    # Send answer to paypad
+    # print(type(config_data))
+    message.set_status_full(200, mint_url)
     
+    # Send answer to paypad
