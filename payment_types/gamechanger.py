@@ -22,7 +22,7 @@ import subprocess
 import requests
 from pprint import pprint
 import os
-
+import gzip
 import qrcode
 import qrcode.image.svg
 
@@ -66,6 +66,19 @@ def gc_encode_brotli(gc_script):
 def gc_decode_brotli(url_string):
     brotli_data = base64_decode(url_string.encode())
     json_string = brotli.decompress(brotli_data)
+    return json_string.decode()
+
+
+def gc_encode_gzip(gc_script):
+    json_string = json_deindent(gc_script)
+    brotli_data = gzip.compress(json_string.encode())
+    url_string = base64_encode(brotli_data)
+    return url_string.decode()
+
+
+def gc_decode_gzip(url_string):
+    brotli_data = base64_decode(url_string.encode())
+    json_string = gzip.decompress(brotli_data)
     return json_string.decode()
 
 
@@ -378,6 +391,11 @@ def qr_code(json_dict):
         tx_json = cardano_transaction_json_v2(json_dict)
         gcscript = gc_encode_brotli(tx_json)
         url = "https://beta-preprod-wallet.gamechanger.finance/api/2/run/" + gcscript
+
+    elif network_type == "Beta-gzip":
+        tx_json = cardano_transaction_json_v2(json_dict)
+        gcscript = gc_encode_gzip(tx_json)
+        url = "https://beta-preprod-wallet.gamechanger.finance/api/2/run/3-" + gcscript
 
     print("\n" + url)
 
