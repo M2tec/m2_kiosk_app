@@ -71,14 +71,14 @@ def gc_decode_brotli(url_string):
 
 def gc_encode_gzip(gc_script):
     json_string = json_deindent(gc_script)
-    brotli_data = gzip.compress(json_string.encode())
-    url_string = base64_encode(brotli_data)
+    gzip_data = gzip.compress(json_string.encode())
+    url_string = base64_encode(gzip_data)
     return url_string.decode()
 
 
 def gc_decode_gzip(url_string):
-    brotli_data = base64_decode(url_string.encode())
-    json_string = gzip.decompress(brotli_data)
+    gzip_data = base64_decode(url_string.encode())
+    json_string = gzip.decompress(gzip_data)
     return json_string.decode()
 
 
@@ -125,7 +125,7 @@ def cardano_transaction_json(json_dict):
     transaction_dict = {
         'type': 'tx',
         'title': transaction_id,
-        'description': 'M2tec POS transaction',
+        'description': 'M2tec POS Gzip transaction',
         'outputs': outputs_dict,
     }
 
@@ -176,7 +176,7 @@ def cardano_transaction_json_v2(json_dict):
     transaction_dict = {
         'type': 'script',
         'title': transaction_id,
-        'description': 'M2tec POS transaction',
+        'description': 'M2tec POS Gzip transaction',
         'run': [outputs_dict, sign_dict, submit_dict]
     }
 
@@ -395,7 +395,7 @@ def qr_code(json_dict):
     elif network_type == "Beta-gzip":
         tx_json = cardano_transaction_json_v2(json_dict)
         gcscript = gc_encode_gzip(tx_json)
-        url = "https://beta-preprod-wallet.gamechanger.finance/api/2/run/3-" + gcscript
+        url = "https://beta-preprod-wallet.gamechanger.finance/api/2/run/1-" + gcscript
 
     print("\n" + url)
 
