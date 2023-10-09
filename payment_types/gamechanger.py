@@ -56,19 +56,6 @@ def json_deindent(data):
     return data
 
 
-def gc_encode_brotli(gc_script):
-    json_string = json_deindent(gc_script)
-    brotli_data = brotli.compress(json_string.encode())
-    url_string = base64_encode(brotli_data)
-    return url_string.decode()
-
-
-def gc_decode_brotli(url_string):
-    brotli_data = base64_decode(url_string.encode())
-    json_string = brotli.decompress(brotli_data)
-    return json_string.decode()
-
-
 def gc_encode_gzip(gc_script):
     json_string = json_deindent(gc_script)
     gzip_data = gzip.compress(json_string.encode())
@@ -80,58 +67,6 @@ def gc_decode_gzip(url_string):
     gzip_data = base64_decode(url_string.encode())
     json_string = gzip.decompress(gzip_data)
     return json_string.decode()
-
-
-def gc_encode_lzw(gc_script):
-    ROOT_DIR = os.path.dirname(os.path.abspath(
-        __file__))  # This is your Project Root
-    p = subprocess.Popen(['node', ROOT_DIR + '/../json-url-reduced/json-url-lzw.js',
-                         json.dumps(gc_script)], stdout=subprocess.PIPE)
-    out = p.stdout.read().decode("utf-8").replace("\n", "")
-    # print("Result:" + repr(out))
-    return out
-
-
-def gc_encode_lzma(gc_script):
-    ROOT_DIR = os.path.dirname(os.path.abspath(
-        __file__))  # This is your Project Root
-    p = subprocess.Popen(['node', ROOT_DIR + '/../json-url-reduced/json-url-lzma.js',
-                         json.dumps(gc_script)], stdout=subprocess.PIPE)
-    out = p.stdout.read().decode("utf-8").replace("\n", "")
-    # print("Result:" + repr(out))
-    return out
-
-
-def cardano_transaction_json(json_dict):
-
-    wallet_address = json_dict["wallet_address"]
-    transaction_id = str(json_dict["transaction_id"])
-    token_policyID = json_dict["token_policyID"]
-    token_name = json_dict["token_name"]
-    requested_amount = float(json_dict["amount"]) * 1000000
-
-    amounts_dict_1 = {
-        'quantity': str(int(requested_amount)),
-        'policyId': token_policyID,
-        'assetName': token_name
-    }
-
-    amounts_list = [amounts_dict_1]
-
-    outputs_dict = {
-        wallet_address: amounts_list
-    }
-
-    transaction_dict = {
-        'type': 'tx',
-        'title': transaction_id,
-        'description': 'M2tec POS Gzip transaction',
-        'outputs': outputs_dict,
-    }
-
-    # print(json.dumps(transaction_dict, indent=4, sort_keys=True))
-
-    return transaction_dict
 
 
 def cardano_transaction_json_v2(json_dict):
@@ -368,34 +303,20 @@ def qr_code(json_dict):
     transaction_id = str(json_dict["transaction_id"])
 
     if network_type == 'Mainnet':
-        tx_json = cardano_transaction_json(json_dict)
+        tx_json = cardano_transaction_json_v2(json_dict)
         gcscript = gc_encode_lzw(tx_json)
         url = "https://wallet.gamechanger.finance/api/1/tx/" + gcscript
 
     elif network_type == 'Preprod':
-        tx_json = cardano_transaction_json(json_dict)
-        gcscript = gc_encode_lzw(tx_json)
+        tx_json = cardano_transaction_json_v2(json_dict)
+        gcscript = gc_encode_gzip(tx_json)
         url = 'https://preprod-wallet.gamechanger.finance/api/1/tx/' + gcscript
 
-    elif network_type == "Beta":
-        tx_json = cardano_transaction_json_v2(json_dict)
-        gcscript = gc_encode_lzma(tx_json)
-        url = "https://beta-preprod-wallet.gamechanger.finance/api/2/run/" + gcscript
 
     elif network_type == "Beta-gcfs":
         tx_json = cardano_transaction_json_gcfs(json_dict)
-        gcscript = gc_encode_lzma(tx_json)
-        url = "https://beta-preprod-wallet.gamechanger.finance/api/2/run/" + gcscript
-
-    elif network_type == "Beta-brotli":
-        tx_json = cardano_transaction_json_v2(json_dict)
-        gcscript = gc_encode_brotli(tx_json)
-        url = "https://beta-preprod-wallet.gamechanger.finance/api/2/run/" + gcscript
-
-    elif network_type == "Beta-gzip":
-        tx_json = cardano_transaction_json_v2(json_dict)
         gcscript = gc_encode_gzip(tx_json)
-        url = "https://beta-preprod-wallet.gamechanger.finance/api/2/run/1-" + gcscript
+        url = "https://beta-preprod-wallet.gamechanger.finance/api/2/run/" + gcscript
 
     print("\n" + url)
 
