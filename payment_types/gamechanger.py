@@ -302,21 +302,20 @@ def qr_code(json_dict):
     network_type = json_dict["network_type"]
     transaction_id = str(json_dict["transaction_id"])
 
-    if network_type == 'Mainnet':
-        tx_json = cardano_transaction_json_v2(json_dict)
-        gcscript = gc_encode_lzw(tx_json)
-        url = "https://wallet.gamechanger.finance/api/1/tx/" + gcscript
-
-    elif network_type == 'Preprod':
+    if network_type == 'Preprod':
         tx_json = cardano_transaction_json_v2(json_dict)
         gcscript = gc_encode_gzip(tx_json)
-        url = 'https://preprod-wallet.gamechanger.finance/api/1/tx/' + gcscript
+        url = "https://beta-preprod-wallet.gamechanger.finance/api/2/run/1-" + gcscript
 
+    elif network_type == 'Mainnet':
+        tx_json = cardano_transaction_json_v2(json_dict)
+        gcscript = gc_encode_gzip(tx_json)
+        url = 'https://beta-wallet.gamechanger.finance/api/2/run/1-' + gcscript
 
     elif network_type == "Beta-gcfs":
         tx_json = cardano_transaction_json_gcfs(json_dict)
         gcscript = gc_encode_gzip(tx_json)
-        url = "https://beta-preprod-wallet.gamechanger.finance/api/2/run/" + gcscript
+        url = "https://beta-preprod-wallet.gamechanger.finance/api/2/run/1-" + gcscript
 
     print("\n" + url)
 
