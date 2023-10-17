@@ -4,17 +4,17 @@
         "locale_setting": "en_US.UTF-8"
     },
     "cardano": {
-        "network_type": "beta",
+        "network_type": "Preprod",
         "payment_type": "gamechanger",
         "payment_validator": "koios",
         "networks": [
             {
-                "name": "preprod",
-                "selected_token": "tADA",
+                "name": "Preprod",
+                "selected_token": "ada",
                 "tokens": [
                     {
-                        "name": "tADA",
-                        "policyID": "tada"
+                        "name": "ada",
+                        "policyID": "ada"
                     },
                     {
                         "name": "FakeUSD",
@@ -23,25 +23,11 @@
                 ]
             },
             {
-                "name": "beta",
-                "selected_token": "tADA",
-                "tokens": [
-                    {
-                        "name": "tADA",
-                        "policyID": "tada"
-                    },
-                    {
-                        "name": "FakeUSD",
-                        "policyID": "2f7e0f588efe4e2836c829c50619a498ddf5521255bf5e1e9f9f5a13"
-                    }
-                ]
-            },
-            {
-                "name": "mainnet",
+                "name": "Mainnet",
                 "selected_token": "PROXIE",
                 "tokens": [
                     {
-                        "name": "ADA",
+                        "name": "ada",
                         "policyID": "ada"
                     },
                     {

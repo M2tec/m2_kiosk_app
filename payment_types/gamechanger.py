@@ -77,45 +77,44 @@ def cardano_transaction_json_v2(json_dict):
     token_name = json_dict["token_name"]
     requested_amount = float(json_dict["amount"]) * 1000000
 
-    assets_list = [{
-        'quantity': str(int(requested_amount)),
-        'policyId': token_policyID,
-        'assetName': token_name
-    }]
 
-    outputs_dict = {
-        'type': 'buildTx',
-        'tx': {
-            'outputs': [
-                {
-                    'address': wallet_address,
-                    'assets': assets_list
+    transaction_dict = {
+        "type": "script",
+        "title": transaction_id,
+        "description": "M2 tx",
+        "run": {
+            "s1": {
+                "type": "buildTx",
+                "tx": {
+                    "outputs": [
+                        {
+                            "address": wallet_address,
+                            "assets": [
+                                {
+                                    "policyId": token_policyID,
+                                    "assetName": token_name,
+                                    "quantity": str(int(requested_amount))
+                                }
+                            ]
+                        }
+                    ]
                 }
-            ]
+            },
+            "s2": {
+                "type": "signTxs",
+                "detailedPermissions": False,
+                "txs": [
+                    "{get('cache.s1.txHex')}"
+                ]
+            },
+            "s3": {
+                "type": "submitTxs",
+                "txs": "{get('cache.s2')}"
+            }
         }
     }
 
-    sign_dict = {
-        "type": "signTxs",
-        "detailedPermissions": False,
-        "txs": [
-                "{get('cache.0.txHex')}"
-        ]
-    }
-
-    submit_dict = {
-        "type": "submitTxs",
-        "txs": "{get('cache.1')}"
-    }
-
-    transaction_dict = {
-        'type': 'script',
-        'title': transaction_id,
-        'description': 'M2tec POS Gzip transaction',
-        'run': [outputs_dict, sign_dict, submit_dict]
-    }
-
-    # print(json.dumps(transaction_dict, indent=4, sort_keys=True))
+    print(json.dumps(transaction_dict, indent=4, sort_keys=False))
 
     return transaction_dict
 
