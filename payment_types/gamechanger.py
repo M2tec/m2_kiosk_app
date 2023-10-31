@@ -18,16 +18,12 @@
 #
 
 import json
-import subprocess
-import requests
 from pprint import pprint
-import os
 import gzip
 import qrcode
 import qrcode.image.svg
 
 import json
-import brotli
 import base64
 
 # import nft_storage

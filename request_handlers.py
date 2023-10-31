@@ -25,7 +25,6 @@ from payment_types import *
 from payment_validators import *
 import base64
 import requests
-import io
 
 import gi
 gi.require_version('Gdk', '3.0')

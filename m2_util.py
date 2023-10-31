@@ -18,9 +18,6 @@
 #
 
 import os
-import secrets
-import string
-import subprocess
 import locale
 import platform
 import json
