@@ -43,6 +43,9 @@ def get_config_data():
         print("Config file not found: " + config_folder + config_file)
         template_file = "/usr/local/share/m2-kiosk-app-hyper/m2_config_template.json"
         shutil.copyfile(template_file, config_folder + config_file)
+        f = open(config_folder + config_file)
+        config_data = json.load(f)
+        f.close()
     return config_data
 
 
