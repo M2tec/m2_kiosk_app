@@ -1,4 +1,5 @@
 {
+    "version": 1,
     "globals": {
         "vat_in_metadata": "True",
         "locale_setting": "en_US.UTF-8"
@@ -24,15 +25,11 @@
             },
             {
                 "name": "Mainnet",
-                "selected_token": "PROXIE",
+                "selected_token": "ada",
                 "tokens": [
                     {
                         "name": "ada",
                         "policyID": "ada"
-                    },
-                    {
-                        "name": "PROXIE",
-                        "policyID": "20cd68533b47565f3c61efb39c30fdace9963bfa4c0060b613448e3c"
                     },
                     {
                         "name": "DJED",

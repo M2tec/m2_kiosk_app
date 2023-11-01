@@ -21,6 +21,7 @@ import os
 import locale
 import platform
 import json
+import shutil
 
 import gi
 gi.require_version('GdkPixbuf', '2.0')
@@ -32,12 +33,7 @@ HOME_DIR = os.path.expanduser('~')
 
 def get_config_data():
     try:
-        if platform.machine() == 'x86_64':
-            config_folder = HOME_DIR + "/.config/m2-kiosk/"
-        else:
-            #config_folder = "/var/www/m2-kiosk/.config/"
-            config_folder = HOME_DIR + "/.config/m2-kiosk/"
-            
+        config_folder = HOME_DIR + "/.config/m2-kiosk/"           
         # print(config_folder)
         config_file = "config.json"
         f = open(config_folder + config_file)
@@ -45,6 +41,8 @@ def get_config_data():
         f.close()
     except FileNotFoundError:
         print("Config file not found: " + config_folder + config_file)
+        template_file = "/usr/local/share/m2-kiosk-app-hyper/m2_config_template.json"
+        shutil.copyfile(template_file, config_folder + config_file)
     return config_data
 
 
