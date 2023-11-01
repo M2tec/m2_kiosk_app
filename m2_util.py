@@ -29,23 +29,28 @@ from gi.repository import GdkPixbuf  # NOQA
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))  # This is your Project Root
 HOME_DIR = os.path.expanduser('~')
+config_folder = HOME_DIR + "/.config/m2-kiosk/"
+config_file = "config.json"
+template_file = "/usr/local/share/m2-kiosk-app-hyper/m2_config_template.json"
+
+def config_file_exist():
+    try:
+        f = open(config_folder + config_file)
+    except FileNotFoundError:
+        print("Install template")
+        shutil.copyfile(template_file, config_folder + config_file)
 
 
 def get_config_data():
-    try:
-        config_folder = HOME_DIR + "/.config/m2-kiosk/"           
-        # print(config_folder)
-        config_file = "config.json"
+
+    config_file_exist()
+
+    try:      
         f = open(config_folder + config_file)
         config_data = json.load(f)
         f.close()
     except FileNotFoundError:
         print("Config file not found: " + config_folder + config_file)
-        template_file = "/usr/local/share/m2-kiosk-app-hyper/m2_config_template.json"
-        shutil.copyfile(template_file, config_folder + config_file)
-        f = open(config_folder + config_file)
-        config_data = json.load(f)
-        f.close()
     return config_data
 
 
@@ -70,18 +75,3 @@ def is_port_in_use(port):
         return s.connect_ex(('localhost', port)) == 0
 
 
-def check_odoo_and_cardano(odoo_port, wallet_port):
-
-    # Check if Odoo is running
-    if is_port_in_use(int(odoo_port)):
-        print("Connecting to Odoo on port: " + str(odoo_port))
-    else:
-        print("Make sure Odoo is running on port: " + str(odoo_port))
-        quit()
-
-    # Check if Cardano wallet backend is running
-    if is_port_in_use(int(wallet_port)):
-        print("Connecting to Cardano wallet backend on port: " + str(wallet_port))
-    else:
-        print("Make sure the Cardano wallet backend is running on port: " + str(wallet_port))
-        quit()
