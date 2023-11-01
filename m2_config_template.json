@@ -1,58 +1,56 @@
 {
-    "version": 1,
-    "globals": {
-        "vat_in_metadata": "True",
-        "locale_setting": "en_US.UTF-8"
-    },
-    "cardano": {
-        "network_type": "Preprod",
-        "payment_type": "gamechanger",
-        "payment_validator": "koios",
-        "networks": [
-            {
-                "name": "Preprod",
-                "wallet_address": "addr_test1qz759fg46yvp28wrcmnxn87xq30yj6c8mh7y40zjnrg9h546h0qr3avqde9mumdaf4gykrtjz58l30g7mpy3r8nxku7q3dtrlt",
-                "selected_token": "ada",
-                "loyalty_token": {
-                    "name": "",
-                    "amount": "0",
-                    "mint_url": ""
-                },
-                "tokens": [
-                    {
-                        "name": "ada",
-                        "policyID": "ada"
-                    },
-                    {
-                        "name": "FakeUSD",
-                        "policyID": "2f7e0f588efe4e2836c829c50619a498ddf5521255bf5e1e9f9f5a13"
-                    }
-                ]
-            },
-            {
-                "name": "Mainnet",
-                "wallet_address": "addr1qyw0m0dupsqqkjnrphgyg0ytg3vggxn23cur80v3ae0z2dwsz7ven493h68du8pnh65qvvqtgfgy3jkqzs3qjz05jtcslagwz4",
-                "selected_token": "ad ",
-                "loyalty_token": {
-                    "name": "",
-                    "amount": "0",
-                    "mint_url": ""
-                    },
-                 "tokens": [
-                    {
-                        "name": "ada",
-                        "policyID": "ada"
-                    },
-                    {
-                        "name": "DJED",
-                        "policyID": "8db269c3ec630e06ae29f74bc39edd1f87c819f1056206e879a1cd61"
-                    },
-                    {
-                        "name": "iUSD",
-                        "policyID": "66d78b4a3cb3d37afa0ec36461e51ecbde00f26c8f0a68f94b69880"
-                    }
-                ]
-            }
+  "version": 1,
+  "globals": {
+    "vat_in_metadata": "True",
+    "locale_setting": "en_US.UTF-8"
+  },
+  "cardano": {
+    "network_type": "Preprod",
+    "payment_type": "gamechanger",
+    "payment_validator": "koios",
+    "networks": {
+      "Preprod": {
+        "wallet_address": "addr_test1qz759fg46yvp28wrcmnxn87xq30yj6c8mh7y40zjnrg9h546h0qr3avqde9mumdaf4gykrtjz58l30g7mpy3r8nxku7q3dtrlt",
+        "selected_token": "ada",
+        "loyalty_token": {
+          "name": "",
+          "amount": "0",
+          "mint_url": ""
+        },
+        "tokens": [
+          {
+            "name": "ada",
+            "policyID": "ada"
+          },
+          {
+            "name": "FakeUSD",
+            "policyID": "2f7e0f588efe4e2836c829c50619a498ddf5521255bf5e1e9f9f5a13"
+          }
         ]
+      },
+      "Mainnet": {
+        "wallet_address": "addr1qyw0m0dupsqqkjnrphgyg0ytg3vggxn23cur80v3ae0z2dwsz7ven493h68du8pnh65qvvqtgfgy3jkqzs3qjz05jtcslagwz4",
+        "selected_token": "ad ",
+        "loyalty_token": {
+          "name": "",
+          "amount": "0",
+          "mint_url": ""
+        },
+        "tokens": [
+          {
+            "name": "ada",
+            "policyID": "ada"
+          },
+          {
+            "name": "DJED",
+            "policyID": "8db269c3ec630e06ae29f74bc39edd1f87c819f1056206e879a1cd61"
+          },
+          {
+            "name": "iUSD",
+            "policyID": "66d78b4a3cb3d37afa0ec36461e51ecbde00f26c8f0a68f94b69880"
+          }
+        ]
+      }
     }
+  }
 }
