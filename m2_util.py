@@ -35,11 +35,17 @@ template_file = "/usr/local/share/m2-kiosk-app-hyper/m2_config_template.json"
 
 def config_file_exist():
     try:
+        print("try open config")
         f = open(config_folder + config_file)
     except FileNotFoundError:
         print("Install template")
-        os.mkdir(config_folder)
+        try:
+            os.mkdir(config_folder)
+        except FileExistsError:
+            print("no need to create folder")
+
         shutil.copyfile(template_file, config_folder + config_file)
+
 
 
 def get_config_data():
