@@ -38,6 +38,7 @@ def config_file_exist():
         f = open(config_folder + config_file)
     except FileNotFoundError:
         print("Install template")
+        os.mkdir(config_folder)
         shutil.copyfile(template_file, config_folder + config_file)
 
 

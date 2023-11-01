@@ -230,6 +230,7 @@ if __name__ == "__main__":
             tip_amount = locale.format_string('%.2f', tip_amount)
             self.server.tip_amount_label.set_text(tip_amount)
             
+    m2_util.config_file_exist()
 
     # Setup gtk builder
     builder = Gtk.Builder()
