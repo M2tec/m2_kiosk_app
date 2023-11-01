@@ -11,6 +11,7 @@
         "networks": [
             {
                 "name": "Preprod",
+                "wallet_address": "addr_test1qz759fg46yvp28wrcmnxn87xq30yj6c8mh7y40zjnrg9h546h0qr3avqde9mumdaf4gykrtjz58l30g7mpy3r8nxku7q3dtrlt",
                 "selected_token": "ada",
                 "loyalty_token": {
                     "name": "",
@@ -30,6 +31,7 @@
             },
             {
                 "name": "Mainnet",
+                "wallet_address": "addr1qyw0m0dupsqqkjnrphgyg0ytg3vggxn23cur80v3ae0z2dwsz7ven493h68du8pnh65qvvqtgfgy3jkqzs3qjz05jtcslagwz4",
                 "selected_token": "ad ",
                 "loyalty_token": {
                     "name": "",
