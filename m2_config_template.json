@@ -12,6 +12,11 @@
             {
                 "name": "Preprod",
                 "selected_token": "ada",
+                "loyalty_token": {
+                    "name": "",
+                    "amount": "0",
+                    "mint_url": ""
+                },
                 "tokens": [
                     {
                         "name": "ada",
@@ -25,8 +30,13 @@
             },
             {
                 "name": "Mainnet",
-                "selected_token": "ada",
-                "tokens": [
+                "selected_token": "ad ",
+                "loyalty_token": {
+                    "name": "",
+                    "amount": "0",
+                    "mint_url": ""
+                    },
+                 "tokens": [
                     {
                         "name": "ada",
                         "policyID": "ada"
